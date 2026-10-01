@@ -96,12 +96,10 @@
 
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between protected-ui" oncontextmenu="return triggerSecurityToast(event);" ondragstart="return false;">
 
-  <!-- ======================================================== -->
-  <!-- TOP HEADER BAR: TITLE, ICON & PRESET EXAMPLES            -->
-  <!-- ======================================================== -->
+  <!-- TOP HEADER BAR: TITLE, HOME BUTTON & PRESETS -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-      <!-- Logo & Title (English) -->
+      <!-- Logo & Title -->
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-amber-500 flex items-center justify-center text-white shadow-md shadow-red-500/20">
           <i class="fa-solid fa-fire-burner text-lg"></i>
@@ -116,19 +114,25 @@
         </div>
       </div>
 
-      <!-- Presets / Quick Examples -->
+      <!-- Action Area: Home Button & Preset Examples -->
       <div class="flex items-center gap-2 text-xs flex-wrap">
-        <span class="text-slate-500 font-semibold flex items-center gap-1">
+        <!-- Home Button -->
+        <a href="index.html" class="px-3 py-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 hover:text-indigo-600 font-semibold transition flex items-center gap-1.5 shadow-xs mr-1">
+          <i class="fa-solid fa-house text-slate-500"></i>
+          <span>Home</span>
+        </a>
+
+        <span class="text-slate-500 font-semibold flex items-center gap-1 ml-1">
           <i class="fa-solid fa-wand-magic-sparkles text-indigo-500"></i>
-          Presets (Examples):
+          Presets:
         </span>
-        <button type="button" onclick="setPreset('water_mix')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition border border-slate-200">
+        <button type="button" onclick="setPreset('water_mix')" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition border border-slate-200">
           Water + Water
         </button>
-        <button type="button" onclick="setPreset('copper_water')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition border border-slate-200">
+        <button type="button" onclick="setPreset('copper_water')" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition border border-slate-200">
           Copper + Water
         </button>
-        <button type="button" onclick="setPreset('alu_oil')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition border border-slate-200">
+        <button type="button" onclick="setPreset('alu_oil')" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition border border-slate-200">
           Aluminium + Oil
         </button>
       </div>
@@ -137,20 +141,15 @@
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-6">
     
-    <!-- ======================================================== -->
-    <!-- TOP DIAGRAM: HEAT FLOW ILLUSTRATION (HOT -> COLD)        -->
-    <!-- ======================================================== -->
-    <!-- RAJAH ATAS: ILUSTRASI ALIRAN HABA (HOT -> COLD)          -->
-    <!-- ======================================================== -->
+    <!-- TOP DIAGRAM: HEAT FLOW ILLUSTRATION (HOT -> COLD) -->
     <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200">
-      <!-- Bingkai merah persis seperti di dalam gambar soalan -->
       <div class="border-[2.5px] border-[#EB2B2B] rounded-xl p-4 sm:p-6 bg-gradient-to-b from-white to-slate-50 flex flex-col items-center">
         
         <div class="w-full max-w-4xl relative select-none">
-          <!-- SVG Ilustrasi 3D HOT - HEAT FLOW - COLD yang menyerupai gambar asal -->
+          <!-- SVG 3D HOT - HEAT FLOW - COLD Illustration -->
           <svg viewBox="0 0 820 250" class="w-full h-auto overflow-visible drop-shadow-sm font-sans">
             <defs>
-              <!-- Kecerunan Tiub Pemindahan Haba -->
+              <!-- Heat Transfer Tube Gradient -->
               <linearGradient id="heatFlowConduit" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="#DE2222" />
                 <stop offset="25%" stop-color="#C23846" />
@@ -159,46 +158,35 @@
                 <stop offset="100%" stop-color="#147BA6" />
               </linearGradient>
 
-              <!-- Kecerunan Permukaan Atas Tiub -->
+              <!-- Conduit Top Surface Gradient -->
               <linearGradient id="conduitTopGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="#E74C3C" />
                 <stop offset="60%" stop-color="#606680" />
                 <stop offset="100%" stop-color="#3498DB" />
               </linearGradient>
 
-              <!-- Drop shadow untuk arrow -->
+              <!-- Drop shadow for arrow -->
               <filter id="shadow" x="-5%" y="-10%" width="110%" height="130%">
                 <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.35"/>
               </filter>
             </defs>
 
-            <!-- ========================================== -->
-            <!-- 1. BLOK KIRI: HOT (KUBUS MERAH ISOMETRIK) -->
-            <!-- ========================================== -->
+            <!-- 1. LEFT BLOCK: HOT (ISOMETRIC RED CUBE) -->
             <g id="hotCubeGroup">
-              <!-- Muka Belakang/Atas Kubus Merah -->
               <polygon points="40,65 140,25 210,50 110,95" fill="#FF4438" stroke="#D1180E" stroke-width="2"/>
-              <!-- Muka Sisi Kanan Kubus Merah (Tempat tiub keluar) -->
               <polygon points="110,95 210,50 210,195 110,240" fill="#B30F07" stroke="#8E0800" stroke-width="2"/>
-              <!-- Muka Depan Kubus Merah -->
               <polygon points="40,65 110,95 110,240 40,205" fill="#E61A10" stroke="#BD1006" stroke-width="2"/>
-              <!-- Teks "HOT" pada muka depan -->
               <text x="75" y="162" text-anchor="middle" fill="#FFFFFF" font-size="16" font-weight="900" letter-spacing="1.5">HOT</text>
             </g>
 
-            <!-- ========================================== -->
-            <!-- 2. SALURAN PENGALIRAN HABA (CONDUIT BAR)  -->
-            <!-- ========================================== -->
-            <!-- Permukaan Atas Saluran -->
+            <!-- 2. HEAT TRANSFER CONDUIT BAR -->
             <polygon points="175,70 635,70 600,100 145,100" fill="url(#conduitTopGrad)" stroke="#4A5568" stroke-width="1.5" opacity="0.95"/>
-
-            <!-- Permukaan Hadapan Saluran -->
             <polygon points="145,100 600,100 600,185 145,185" fill="url(#heatFlowConduit)" stroke="#2D3748" stroke-width="1.5"/>
 
-            <!-- Garis Skala / Halangan Keseimbangan Di Saluran (Tengah) -->
+            <!-- Thermal Equilibrium Central Scale Line -->
             <line x1="495" y1="85" x2="495" y2="195" stroke="#FDE047" stroke-dasharray="4,3" stroke-width="2.5" opacity="0.9"/>
             
-            <!-- Penanda Keseimbangan Terma Tengah pada Rajah -->
+            <!-- Central Thermal Equilibrium Marker Badge -->
             <g transform="translate(495, 80)">
               <rect x="-48" y="-22" width="96" height="22" rx="6" fill="#1E293B" stroke="#FDE047" stroke-width="1.5"/>
               <text x="0" y="-7" text-anchor="middle" fill="#FDE047" font-size="10" font-weight="bold" font-family="'JetBrains Mono', monospace">
@@ -207,32 +195,23 @@
               <polygon points="-4,0 4,0 0,6" fill="#FDE047"/>
             </g>
 
-            <!-- ANAK PANAH KUNING "HEAT FLOW" PERSIS SEPERTI DALAM GAMBAR -->
+            <!-- YELLOW "HEAT FLOW" ARROW -->
             <g filter="url(#shadow)">
-              <!-- Batang Panah Kuning Terang -->
               <rect x="160" y="123" width="280" height="38" rx="2" fill="#FACC15" stroke="#EAB308" stroke-width="1.5"/>
-              <!-- Kepala Panah Kuning -->
               <polygon points="440,110 478,142 440,174" fill="#FACC15" stroke="#EAB308" stroke-width="1.5"/>
-              <!-- Teks "HEAT FLOW" di dalam anak panah -->
               <text x="290" y="148" text-anchor="middle" fill="#000000" font-size="15" font-weight="900" font-family="'JetBrains Mono', monospace" letter-spacing="2.5">HEAT FLOW</text>
             </g>
 
-            <!-- ========================================== -->
-            <!-- 3. BLOK KANAN: COLD (KUBUS BIRU ISOMETRIK) -->
-            <!-- ========================================== -->
+            <!-- 3. RIGHT BLOCK: COLD (ISOMETRIC BLUE CUBE) -->
             <g id="coldCubeGroup">
-              <!-- Muka Atas Kubus Biru -->
               <polygon points="600,65 670,25 770,50 700,95" fill="#38BDF8" stroke="#0284C7" stroke-width="2"/>
-              <!-- Muka Hadapan Kubus Biru -->
               <polygon points="600,65 700,95 700,240 600,205" fill="#0284C7" stroke="#0369A1" stroke-width="2"/>
-              <!-- Muka Sisi Kanan Kubus Biru -->
               <polygon points="700,95 770,50 770,195 700,240" fill="#0369A1" stroke="#075985" stroke-width="2"/>
-              <!-- Teks "COLD" pada muka depan -->
-            <polygon points="700,95 770,50 770,195 700,240" fill="#0369A1" stroke="#075985" stroke-width="2"/>
-            <text x="650" y="162" text-anchor="middle" fill="#FFFFFF" font-size="16" font-weight="900" letter-spacing="1.5">COLD</text>
+              <text x="650" y="162" text-anchor="middle" fill="#FFFFFF" font-size="16" font-weight="900" letter-spacing="1.5">COLD</text>
+            </g>
           </svg>
 
-          <!-- Label Nilai Suhu & Jisim Secara Dinamik Atas & Bawah Rajah -->
+          <!-- Dynamic Temperature & Mass Information Bar -->
           <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs px-2">
             <!-- Hot Object Info -->
             <div class="flex items-center gap-2">
@@ -263,9 +242,6 @@
       </div>
     </section>
 
-    <!-- ======================================================== -->
-    <!-- SECTION 1: PARAMETER INPUT (COMPACT STRIP)               -->
-    <!-- ======================================================== -->
     <section class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
       <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
         <div class="flex items-center gap-2">
@@ -397,9 +373,6 @@
       </div>
     </section>
 
-    <!-- ======================================================== -->
-    <!-- SECTION 2: SIDE-BY-SIDE STEP-BY-STEP WORKING             -->
-    <!-- ======================================================== -->
     <section class="space-y-4">
       <div class="flex items-center justify-between">
         <div>
@@ -467,7 +440,6 @@
 
           <!-- ANSWER BOX & 4 LEGEND BOXES METHOD 1 -->
           <div class="space-y-4 pt-2 border-t border-amber-100">
-            <!-- Final Answer Method 1 -->
             <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-3 flex items-center justify-between">
               <div>
                 <div class="text-xs font-bold text-amber-900">Final Temperature &theta;<sub>f</sub> (Method 1):</div>
@@ -480,22 +452,18 @@
 
             <!-- 4 LEGEND BOXES METHOD 1 -->
             <div class="grid grid-cols-4 gap-2 text-center select-none">
-              <!-- Q1 -->
               <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
                 <div class="font-bold text-indigo-700 font-mono text-xs sm:text-sm">Q₁</div>
                 <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Heating</div>
               </div>
-              <!-- Q2 -->
               <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
                 <div class="font-bold text-rose-700 font-mono text-xs sm:text-sm">Q₂</div>
                 <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Cooling</div>
               </div>
-              <!-- θf -->
               <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
                 <div class="font-bold text-amber-700 font-mono text-xs sm:text-sm">&theta;<sub>f</sub></div>
                 <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Final temp</div>
               </div>
-              <!-- θi -->
               <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
                 <div class="font-bold text-slate-900 font-mono text-xs sm:text-sm">&theta;<sub>i</sub></div>
                 <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Initial temp</div>
@@ -556,7 +524,6 @@
 
           <!-- ANSWER BOX & 4 LEGEND BOXES METHOD 2 -->
           <div class="space-y-4 pt-2 border-t border-emerald-100">
-            <!-- Final Answer Method 2 -->
             <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3 flex items-center justify-between">
               <div>
                 <div class="text-xs font-bold text-emerald-900">Final Temperature &theta;<sub>f</sub> (Method 2):</div>
@@ -569,22 +536,18 @@
 
             <!-- 4 LEGEND BOXES METHOD 2 -->
             <div class="grid grid-cols-4 gap-2 text-center select-none">
-              <!-- Qr -->
               <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
                 <div class="font-bold text-amber-700 font-mono text-xs sm:text-sm">Q<sub>r</sub></div>
                 <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Released</div>
               </div>
-              <!-- Qa -->
               <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
                 <div class="font-bold text-emerald-700 font-mono text-xs sm:text-sm">Q<sub>a</sub></div>
                 <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Absorbed</div>
               </div>
-              <!-- θf -->
               <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
                 <div class="font-bold text-amber-700 font-mono text-xs sm:text-sm">&theta;<sub>f</sub></div>
                 <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Final temp</div>
               </div>
-              <!-- θi -->
               <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
                 <div class="font-bold text-slate-900 font-mono text-xs sm:text-sm">&theta;<sub>i</sub></div>
                 <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Initial temp</div>
@@ -599,9 +562,6 @@
 
   </main>
 
-  <!-- ======================================================== -->
-  <!-- OFFICIAL FOOTER: POLITEKNIK PORT DICKSON                 -->
-  <!-- ======================================================== -->
   <footer class="mt-10 border-t border-slate-200 bg-white/80 backdrop-blur-xs py-5 px-4 text-center">
     <div class="max-w-4xl mx-auto flex flex-col items-center justify-center space-y-1 text-slate-700">
       <div class="text-xs sm:text-sm font-extrabold tracking-wider uppercase text-slate-900 flex items-center gap-1.5">
@@ -614,7 +574,7 @@
     </div>
   </footer>
 
-  <!-- Custom Security Toast Popup (Tidak menggunakan alert) -->
+  <!-- Custom Security Toast Popup -->
   <div id="securityToast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 ease-out bg-slate-900/95 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700/80 flex items-center gap-3 max-w-sm">
     <div class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
       <i class="fa-solid fa-lock text-sm"></i>
@@ -647,35 +607,28 @@
       return false;
     }
 
-    // Sekat pintasan papan kekunci biasa bagi inspect/copy/view source
+    // Key shortcut protection
     document.addEventListener('keydown', function(e) {
-      // F12 (DevTools)
       if (e.key === 'F12' || e.keyCode === 123) {
         triggerSecurityToast(e);
         return false;
       }
-      // Ctrl+Shift+I / Cmd+Opt+I (Inspect)
-      // Ctrl+Shift+J / Cmd+Opt+J (Console)
-      // Ctrl+Shift+C / Cmd+Opt+C (Inspect Element)
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
         triggerSecurityToast(e);
         return false;
       }
-      // Ctrl+U / Cmd+Opt+U (View Source)
       if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) {
         triggerSecurityToast(e);
         return false;
       }
-      // Ctrl+S / Cmd+S (Save Page)
       if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
         triggerSecurityToast(e);
         return false;
       }
     });
 
-    // Mesej amaran hak cipta dalam Console Log
     console.log(
-      '%cNOTICE: Protected Educational Application\n%c© 2026 MOHDSAIFULPAHRUDIN • Politeknik Port Dickson. All rights reserved.\nUnauthorized reproduction, scraping, or distribution of this code/layout is prohibited.',
+      '%cNOTICE: Protected Educational Application\n%c© 2026 MOHDSAIFULPAHRUDIN • Politeknik Port Dickson. All rights reserved.',
       'color: #0284c7; font-size: 14px; font-weight: bold;',
       'color: #64748b; font-size: 11px;'
     );
@@ -767,7 +720,7 @@
       document.getElementById('dispName1').innerText = materialName1;
       document.getElementById('dispName2').innerText = materialName2;
 
-      // Update Diagram Elements at Top
+      // Update Top Diagram Elements
       const diagName1 = document.getElementById('diagName1');
       const diagName2 = document.getElementById('diagName2');
       const diagTemp1 = document.getElementById('diagTemp1');
@@ -822,7 +775,6 @@
         </div>
       `;
 
-      // Direct expansion with brackets around numbers, theta_f outside
       document.getElementById('m1_step2').innerHTML = `
         <div>(${fmt(C1)})(${tfHtml} - ${fmt(t1)}) + (${fmt(C2)})(${tfHtml} - ${fmt(t2)}) = 0</div>
         <div>[(${fmt(C1)}) &times; ${tfHtml}] - [${fmt(C1)} &times; ${fmt(t1)}] + [(${fmt(C2)}) &times; ${tfHtml}] - [${fmt(C2)} &times; ${fmt(t2)}] = 0</div>
@@ -852,7 +804,6 @@
         </div>
       `;
 
-      // Direct expansion with brackets around numbers, theta_f outside
       document.getElementById('m2_step2').innerHTML = `
         <div>(${fmt(C1)})(${fmt(t1)} - ${tfHtml}) = (${fmt(C2)})(${tfHtml} - ${fmt(t2)})</div>
         <div>[${fmt(C1)} &times; ${fmt(t1)}] - [(${fmt(C1)}) &times; ${tfHtml}] = [(${fmt(C2)}) &times; ${tfHtml}] - [${fmt(C2)} &times; ${fmt(t2)}]</div>
