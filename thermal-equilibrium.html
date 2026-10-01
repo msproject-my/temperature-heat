@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thermal Equilibrium Calculator - 2 Methods for Final Temperature</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- KaTeX for crisp mathematical formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brandHot: '#EF4444',
+            brandCold: '#0284C7',
+            goldCard: '#FDE047',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .math-font {
+      font-family: 'KaTeX_Math', 'Times New Roman', serif;
+    }
+    /* Distinctive styling for theta_f to eliminate any confusion with zero */
+    .symbol-theta {
+      color: #9333ea; /* distinct purple accent */
+      font-weight: 700;
+      font-family: 'KaTeX_Math', Georgia, serif;
+      letter-spacing: 0.5px;
+      display: inline-block;
+      padding: 0 1px;
+    }
+    .symbol-theta sub {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.72em;
+      font-weight: 800;
+      color: #7e22ce;
+    }
+    .num-val {
+      font-family: 'JetBrains Mono', monospace;
+      color: #1e293b;
+    }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+    .heat-gradient {
+      background: linear-gradient(90deg, #ef4444 0%, #f97316 45%, #0284c7 100%);
+    }
+    @keyframes pulseArrow {
+      0%, 100% { transform: translateX(0px); opacity: 0.9; }
+      50% { transform: translateX(10px); opacity: 1; }
+    }
+    .animate-arrow {
+      animation: pulseArrow 1.8s infinite ease-in-out;
+    }
+
+    /* Keselamatan reka bentuk & perlindungan salinan */
+    .protected-ui {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    /* Pastikan ruangan input angka tetap boleh diklik & ditaip oleh pengguna */
+    input, button, select, textarea {
+      -webkit-user-select: auto !important;
+      -moz-user-select: auto !important;
+      -ms-user-select: auto !important;
+      user-select: auto !important;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between protected-ui" oncontextmenu="return triggerSecurityToast(event);" ondragstart="return false;">
+
+  <!-- ======================================================== -->
+  <!-- TOP HEADER BAR: TITLE, ICON & PRESET EXAMPLES            -->
+  <!-- ======================================================== -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Logo & Title (English) -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-amber-500 flex items-center justify-center text-white shadow-md shadow-red-500/20">
+          <i class="fa-solid fa-fire-burner text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight leading-tight">
+            Thermal Equilibrium
+          </h1>
+          <p class="text-xs text-slate-500 font-medium">
+            Final Temperature (&theta;<sub>f</sub>) Calculator &ndash; 2 Step-by-Step Methods
+          </p>
+        </div>
+      </div>
+
+      <!-- Presets / Quick Examples -->
+      <div class="flex items-center gap-2 text-xs flex-wrap">
+        <span class="text-slate-500 font-semibold flex items-center gap-1">
+          <i class="fa-solid fa-wand-magic-sparkles text-indigo-500"></i>
+          Presets (Examples):
+        </span>
+        <button type="button" onclick="setPreset('water_mix')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition border border-slate-200">
+          Water + Water
+        </button>
+        <button type="button" onclick="setPreset('copper_water')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition border border-slate-200">
+          Copper + Water
+        </button>
+        <button type="button" onclick="setPreset('alu_oil')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition border border-slate-200">
+          Aluminium + Oil
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-6">
+    
+    <!-- ======================================================== -->
+    <!-- TOP DIAGRAM: HEAT FLOW ILLUSTRATION (HOT -> COLD)        -->
+    <!-- ======================================================== -->
+    <!-- RAJAH ATAS: ILUSTRASI ALIRAN HABA (HOT -> COLD)          -->
+    <!-- ======================================================== -->
+    <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200">
+      <!-- Bingkai merah persis seperti di dalam gambar soalan -->
+      <div class="border-[2.5px] border-[#EB2B2B] rounded-xl p-4 sm:p-6 bg-gradient-to-b from-white to-slate-50 flex flex-col items-center">
+        
+        <div class="w-full max-w-4xl relative select-none">
+          <!-- SVG Ilustrasi 3D HOT - HEAT FLOW - COLD yang menyerupai gambar asal -->
+          <svg viewBox="0 0 820 250" class="w-full h-auto overflow-visible drop-shadow-sm font-sans">
+            <defs>
+              <!-- Kecerunan Tiub Pemindahan Haba -->
+              <linearGradient id="heatFlowConduit" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#DE2222" />
+                <stop offset="25%" stop-color="#C23846" />
+                <stop offset="55%" stop-color="#55586F" />
+                <stop offset="78%" stop-color="#2D5875" />
+                <stop offset="100%" stop-color="#147BA6" />
+              </linearGradient>
+
+              <!-- Kecerunan Permukaan Atas Tiub -->
+              <linearGradient id="conduitTopGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#E74C3C" />
+                <stop offset="60%" stop-color="#606680" />
+                <stop offset="100%" stop-color="#3498DB" />
+              </linearGradient>
+
+              <!-- Drop shadow untuk arrow -->
+              <filter id="shadow" x="-5%" y="-10%" width="110%" height="130%">
+                <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.35"/>
+              </filter>
+            </defs>
+
+            <!-- ========================================== -->
+            <!-- 1. BLOK KIRI: HOT (KUBUS MERAH ISOMETRIK) -->
+            <!-- ========================================== -->
+            <g id="hotCubeGroup">
+              <!-- Muka Belakang/Atas Kubus Merah -->
+              <polygon points="40,65 140,25 210,50 110,95" fill="#FF4438" stroke="#D1180E" stroke-width="2"/>
+              <!-- Muka Sisi Kanan Kubus Merah (Tempat tiub keluar) -->
+              <polygon points="110,95 210,50 210,195 110,240" fill="#B30F07" stroke="#8E0800" stroke-width="2"/>
+              <!-- Muka Depan Kubus Merah -->
+              <polygon points="40,65 110,95 110,240 40,205" fill="#E61A10" stroke="#BD1006" stroke-width="2"/>
+              <!-- Teks "HOT" pada muka depan -->
+              <text x="75" y="162" text-anchor="middle" fill="#FFFFFF" font-size="16" font-weight="900" letter-spacing="1.5">HOT</text>
+            </g>
+
+            <!-- ========================================== -->
+            <!-- 2. SALURAN PENGALIRAN HABA (CONDUIT BAR)  -->
+            <!-- ========================================== -->
+            <!-- Permukaan Atas Saluran -->
+            <polygon points="175,70 635,70 600,100 145,100" fill="url(#conduitTopGrad)" stroke="#4A5568" stroke-width="1.5" opacity="0.95"/>
+
+            <!-- Permukaan Hadapan Saluran -->
+            <polygon points="145,100 600,100 600,185 145,185" fill="url(#heatFlowConduit)" stroke="#2D3748" stroke-width="1.5"/>
+
+            <!-- Garis Skala / Halangan Keseimbangan Di Saluran (Tengah) -->
+            <line x1="495" y1="85" x2="495" y2="195" stroke="#FDE047" stroke-dasharray="4,3" stroke-width="2.5" opacity="0.9"/>
+            
+            <!-- Penanda Keseimbangan Terma Tengah pada Rajah -->
+            <g transform="translate(495, 80)">
+              <rect x="-48" y="-22" width="96" height="22" rx="6" fill="#1E293B" stroke="#FDE047" stroke-width="1.5"/>
+              <text x="0" y="-7" text-anchor="middle" fill="#FDE047" font-size="10" font-weight="bold" font-family="'JetBrains Mono', monospace">
+                &theta;<tspan font-size="8" dy="2">f</tspan> <tspan dy="-2" font-size="9" fill="#FFFFFF" id="svgCenterTf">43.33°C</tspan>
+              </text>
+              <polygon points="-4,0 4,0 0,6" fill="#FDE047"/>
+            </g>
+
+            <!-- ANAK PANAH KUNING "HEAT FLOW" PERSIS SEPERTI DALAM GAMBAR -->
+            <g filter="url(#shadow)">
+              <!-- Batang Panah Kuning Terang -->
+              <rect x="160" y="123" width="280" height="38" rx="2" fill="#FACC15" stroke="#EAB308" stroke-width="1.5"/>
+              <!-- Kepala Panah Kuning -->
+              <polygon points="440,110 478,142 440,174" fill="#FACC15" stroke="#EAB308" stroke-width="1.5"/>
+              <!-- Teks "HEAT FLOW" di dalam anak panah -->
+              <text x="290" y="148" text-anchor="middle" fill="#000000" font-size="15" font-weight="900" font-family="'JetBrains Mono', monospace" letter-spacing="2.5">HEAT FLOW</text>
+            </g>
+
+            <!-- ========================================== -->
+            <!-- 3. BLOK KANAN: COLD (KUBUS BIRU ISOMETRIK) -->
+            <!-- ========================================== -->
+            <g id="coldCubeGroup">
+              <!-- Muka Atas Kubus Biru -->
+              <polygon points="600,65 670,25 770,50 700,95" fill="#38BDF8" stroke="#0284C7" stroke-width="2"/>
+              <!-- Muka Hadapan Kubus Biru -->
+              <polygon points="600,65 700,95 700,240 600,205" fill="#0284C7" stroke="#0369A1" stroke-width="2"/>
+              <!-- Muka Sisi Kanan Kubus Biru -->
+              <polygon points="700,95 770,50 770,195 700,240" fill="#0369A1" stroke="#075985" stroke-width="2"/>
+              <!-- Teks "COLD" pada muka depan -->
+            <polygon points="700,95 770,50 770,195 700,240" fill="#0369A1" stroke="#075985" stroke-width="2"/>
+            <text x="650" y="162" text-anchor="middle" fill="#FFFFFF" font-size="16" font-weight="900" letter-spacing="1.5">COLD</text>
+          </svg>
+
+          <!-- Label Nilai Suhu & Jisim Secara Dinamik Atas & Bawah Rajah -->
+          <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs px-2">
+            <!-- Hot Object Info -->
+            <div class="flex items-center gap-2">
+              <span class="inline-block w-3 h-3 rounded-full bg-red-500 shadow-xs"></span>
+              <div>
+                <span class="font-bold text-red-700" id="diagName1">Hot Water</span>
+                <span class="font-mono text-slate-600 block text-[11px]">&theta;<sub>i1</sub> = <b id="diagTemp1" class="text-red-600">80 °C</b> &bull; m₁ = <b id="diagM1">0.5 kg</b></span>
+              </div>
+            </div>
+
+            <!-- Thermal Equilibrium Center Badge -->
+            <div class="text-center bg-amber-50 border border-amber-300 px-3 py-1 rounded-lg shadow-xs">
+              <span class="text-[10px] uppercase font-bold text-amber-800 block tracking-wider">Thermal Equilibrium (&theta;<sub>f</sub>)</span>
+              <span class="text-sm font-black font-mono text-amber-950" id="diagTf">43.33 °C</span>
+            </div>
+
+            <!-- Cold Object Info -->
+            <div class="flex items-center gap-2 text-right">
+              <div>
+                <span class="font-bold text-sky-700" id="diagName2">Cold Water</span>
+                <span class="font-mono text-slate-600 block text-[11px]">&theta;<sub>i2</sub> = <b id="diagTemp2" class="text-sky-600">25 °C</b> &bull; m₂ = <b id="diagM2">1.0 kg</b></span>
+              </div>
+              <span class="inline-block w-3 h-3 rounded-full bg-sky-500 shadow-xs"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- SECTION 1: PARAMETER INPUT (COMPACT STRIP)               -->
+    <!-- ======================================================== -->
+    <section class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold">
+            <i class="fa-solid fa-sliders"></i>
+          </span>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Parameter Input (Data Only)</span>
+        </div>
+        
+        <!-- Live Quick Result Badge -->
+        <div class="flex items-center gap-3">
+          <div class="text-xs text-slate-500 font-medium hidden sm:block">
+            Final Equilibrium Temperature:
+          </div>
+          <div class="px-3 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 font-bold font-mono text-sm flex items-center gap-1.5 shadow-xs">
+            <i class="fa-solid fa-fire text-amber-500 text-xs"></i>
+            &theta;<sub>f</sub> = <span id="compactResultTf" class="text-base text-amber-900 font-black">43.33</span> °C
+          </div>
+          <button onclick="resetDefaults()" title="Reset to default" class="text-xs text-slate-400 hover:text-slate-600 transition px-2 py-1">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+        </div>
+      </div>
+
+      <form id="paramForm" onsubmit="event.preventDefault();" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- HOT OBJECT COMPACT -->
+        <div class="p-3 rounded-lg bg-red-50/60 border border-red-200/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-red-800 flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+              Hot Object (HOT): <span id="dispName1" class="font-normal text-red-600 text-[11px] ml-1">Hot Water</span>
+            </span>
+            <div class="flex items-center gap-1">
+              <span class="text-[10px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300 px-1.5 py-0.5 rounded" title="Method 2">Q<sub>r</sub> (released)</span>
+              <span class="text-[10px] font-mono font-bold bg-red-200/70 text-red-900 px-1.5 py-0.5 rounded" title="Method 1">Q₂ (Cooling)</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                Mass <span class="font-serif italic font-bold">m₁ / m<sub>r</sub></span> (kg)
+              </label>
+              <input type="number" id="inputM1" step="any" min="0.0001" value="0.5" 
+                class="w-full px-2 py-1.5 bg-white rounded border border-red-300 text-slate-900 font-mono text-xs focus:ring-1 focus:ring-red-400 focus:outline-none"
+                oninput="recalculate()">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                <span class="font-serif italic font-bold">c₁ / c<sub>r</sub></span> <span class="text-[9px] text-slate-400">J/(kg·°C)</span>
+              </label>
+              <input type="number" id="inputC1" step="any" min="1" value="4200" 
+                class="w-full px-2 py-1.5 bg-white rounded border border-red-300 text-slate-900 font-mono text-xs focus:ring-1 focus:ring-red-400 focus:outline-none"
+                oninput="recalculate()">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                Temp <span class="font-serif italic font-bold">&theta;<sub>i1</sub> / &theta;<sub>i,r</sub></span> (°C)
+              </label>
+              <input type="number" id="inputT1" step="any" value="80" 
+                class="w-full px-2 py-1.5 bg-white rounded border border-red-300 text-slate-900 font-mono text-xs focus:ring-1 focus:ring-red-400 focus:outline-none"
+                oninput="recalculate()">
+            </div>
+          </div>
+
+          <!-- Micro Quick Pickers -->
+          <div class="mt-2 pt-1.5 border-t border-red-100 flex items-center gap-1.5 text-[10px] text-red-700 flex-wrap">
+            <span class="font-medium text-slate-400">Material:</span>
+            <button type="button" onclick="setMaterial(1, 'Hot Water', 4200)" class="px-1.5 py-0.5 rounded bg-white hover:bg-red-100 border border-red-200">Water (4200)</button>
+            <button type="button" onclick="setMaterial(1, 'Hot Copper', 390)" class="px-1.5 py-0.5 rounded bg-white hover:bg-red-100 border border-red-200">Copper (390)</button>
+            <button type="button" onclick="setMaterial(1, 'Hot Aluminium', 900)" class="px-1.5 py-0.5 rounded bg-white hover:bg-red-100 border border-red-200">Aluminium (900)</button>
+          </div>
+        </div>
+
+        <!-- COLD OBJECT COMPACT -->
+        <div class="p-3 rounded-lg bg-sky-50/60 border border-sky-200/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-sky-800 flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block"></span>
+              Cold Object (COLD): <span id="dispName2" class="font-normal text-sky-600 text-[11px] ml-1">Cold Water</span>
+            </span>
+            <div class="flex items-center gap-1">
+              <span class="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 px-1.5 py-0.5 rounded" title="Method 2">Q<sub>a</sub> (absorbed)</span>
+              <span class="text-[10px] font-mono font-bold bg-sky-200/70 text-sky-900 px-1.5 py-0.5 rounded" title="Method 1">Q₁ (Heating)</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                Mass <span class="font-serif italic font-bold">m₂ / m<sub>a</sub></span> (kg)
+              </label>
+              <input type="number" id="inputM2" step="any" min="0.0001" value="1.0" 
+                class="w-full px-2 py-1.5 bg-white rounded border border-sky-300 text-slate-900 font-mono text-xs focus:ring-1 focus:ring-sky-400 focus:outline-none"
+                oninput="recalculate()">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                <span class="font-serif italic font-bold">c₂ / c<sub>a</sub></span> <span class="text-[9px] text-slate-400">J/(kg·°C)</span>
+              </label>
+              <input type="number" id="inputC2" step="any" min="1" value="4200" 
+                class="w-full px-2 py-1.5 bg-white rounded border border-sky-300 text-slate-900 font-mono text-xs focus:ring-1 focus:ring-sky-400 focus:outline-none"
+                oninput="recalculate()">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                Temp <span class="font-serif italic font-bold">&theta;<sub>i2</sub> / &theta;<sub>i,a</sub></span> (°C)
+              </label>
+              <input type="number" id="inputT2" step="any" value="25" 
+                class="w-full px-2 py-1.5 bg-white rounded border border-sky-300 text-slate-900 font-mono text-xs focus:ring-1 focus:ring-sky-400 focus:outline-none"
+                oninput="recalculate()">
+            </div>
+          </div>
+
+          <!-- Micro Quick Pickers -->
+          <div class="mt-2 pt-1.5 border-t border-sky-100 flex items-center gap-1.5 text-[10px] text-sky-700 flex-wrap">
+            <span class="font-medium text-slate-400">Material:</span>
+            <button type="button" onclick="setMaterial(2, 'Cold Water', 4200)" class="px-1.5 py-0.5 rounded bg-white hover:bg-sky-100 border border-sky-200">Water (4200)</button>
+            <button type="button" onclick="setMaterial(2, 'Cold Oil', 2000)" class="px-1.5 py-0.5 rounded bg-white hover:bg-sky-100 border border-sky-200">Oil (2000)</button>
+            <button type="button" onclick="setMaterial(2, 'Ethanol', 2440)" class="px-1.5 py-0.5 rounded bg-white hover:bg-sky-100 border border-sky-200">Ethanol (2440)</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Alert if Invalid Input -->
+      <div id="errorAlert" class="hidden mt-3 p-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
+        <span id="errorMessage">Please ensure all mass and specific heat capacity values are greater than 0.</span>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- SECTION 2: SIDE-BY-SIDE STEP-BY-STEP WORKING             -->
+    <!-- ======================================================== -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-square-root-variable text-indigo-600"></i>
+            Step-by-Step Calculation (2 Methods Side-by-Side)
+          </h2>
+          <p class="text-xs text-slate-500">Detailed algebraic solution steps to find the Final Temperature (&theta;<sub>f</sub>).</p>
+        </div>
+      </div>
+
+      <!-- SIDE BY SIDE CONTAINER (GRID 2 COLUMNS) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+
+        <!-- ============================================== -->
+        <!-- METHOD 1: HEATING + COOLING = 0                -->
+        <!-- ============================================== -->
+        <div class="bg-white rounded-2xl border-2 border-[#EAD5A0] shadow-sm p-5 flex flex-col justify-between space-y-4">
+          <div class="space-y-4">
+            <!-- Header Gold Banner Method 1 -->
+            <div class="bg-[#F0DEB2] rounded-xl p-4 text-center border border-[#DEBE7F] shadow-inner text-slate-900">
+              <h3 class="font-bold text-sm tracking-widest uppercase mb-1">
+                HEATING + COOLING = 0
+              </h3>
+              <div class="text-xs font-mono space-y-1 font-semibold text-slate-800">
+                <div>Q<sub>heating</sub> + Q<sub>cooling</sub> = 0</div>
+                <div class="text-indigo-900 font-bold">Q₁ + Q₂ = 0</div>
+                <div class="text-slate-700">m₁ &middot; c₁ &middot; &theta;₁ + m₂ &middot; c₂ &middot; &theta;₂ = 0</div>
+                <div class="font-bold text-indigo-900 bg-white/60 py-1 px-2 rounded mt-1 border border-amber-300">
+                  m₁ &middot; c₁ &middot; (&theta;<sub>f</sub> - &theta;<sub>i1</sub>) + m₂ &middot; c₂ &middot; (&theta;<sub>f</sub> - &theta;<sub>i2</sub>) = 0
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 1: SUBSTITUTE PARAMETER VALUES -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                STEP 1: SUBSTITUTE PARAMETER VALUES
+              </span>
+              <div id="m1_step1" class="font-mono text-xs text-slate-800 space-y-1.5 bg-white p-3 rounded-lg border border-slate-200">
+                <!-- Injected via recalculate() -->
+              </div>
+            </div>
+
+            <!-- STEP 2: EXPAND BRACKETS (EXPANSION) -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                STEP 2: EXPAND BRACKETS (EXPANSION)
+              </span>
+              <div id="m1_step2" class="font-mono text-xs text-slate-800 space-y-1 bg-white p-3 rounded-lg border border-slate-200">
+                <!-- Injected via recalculate() -->
+              </div>
+            </div>
+
+            <!-- STEP 3: FACTORISE & SOLVE FOR θf -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                STEP 3: FACTORISE & SOLVE FOR &theta;<sub>f</sub>
+              </span>
+              <div id="m1_step3" class="font-mono text-xs text-slate-800 space-y-1 bg-white p-3 rounded-lg border border-slate-200">
+                <!-- Injected via recalculate() -->
+              </div>
+            </div>
+          </div>
+
+          <!-- ANSWER BOX & 4 LEGEND BOXES METHOD 1 -->
+          <div class="space-y-4 pt-2 border-t border-amber-100">
+            <!-- Final Answer Method 1 -->
+            <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-3 flex items-center justify-between">
+              <div>
+                <div class="text-xs font-bold text-amber-900">Final Temperature &theta;<sub>f</sub> (Method 1):</div>
+                <div class="text-[10px] text-amber-700">Universal principle of thermal energy conservation</div>
+              </div>
+              <div class="text-xl font-black font-mono text-amber-900" id="m1_finalBadge">
+                43.33 °C
+              </div>
+            </div>
+
+            <!-- 4 LEGEND BOXES METHOD 1 -->
+            <div class="grid grid-cols-4 gap-2 text-center select-none">
+              <!-- Q1 -->
+              <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
+                <div class="font-bold text-indigo-700 font-mono text-xs sm:text-sm">Q₁</div>
+                <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Heating</div>
+              </div>
+              <!-- Q2 -->
+              <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
+                <div class="font-bold text-rose-700 font-mono text-xs sm:text-sm">Q₂</div>
+                <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Cooling</div>
+              </div>
+              <!-- θf -->
+              <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
+                <div class="font-bold text-amber-700 font-mono text-xs sm:text-sm">&theta;<sub>f</sub></div>
+                <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Final temp</div>
+              </div>
+              <!-- θi -->
+              <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
+                <div class="font-bold text-slate-900 font-mono text-xs sm:text-sm">&theta;<sub>i</sub></div>
+                <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Initial temp</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- METHOD 2: Q_released = Q_absorbed              -->
+        <!-- ============================================== -->
+        <div class="bg-white rounded-2xl border-2 border-[#D2E4BA] shadow-sm p-5 flex flex-col justify-between space-y-4">
+          <div class="space-y-4">
+            <!-- Header Gold Banner Method 2 -->
+            <div class="bg-[#F0DEB2] rounded-xl p-4 text-center border border-[#DEBE7F] shadow-inner text-slate-900">
+              <h3 class="font-bold text-xs sm:text-sm tracking-normal uppercase mb-1 leading-snug">
+                THERMAL ENERGY RELEASED BY A HOT OBJECT = THERMAL ENERGY ABSORBED BY COLD OBJECT
+              </h3>
+              <div class="text-xs font-mono space-y-1 font-semibold text-slate-800">
+                <div>Q<sub>released</sub> = Q<sub>absorbed</sub></div>
+                <div class="text-emerald-900 font-bold">m<sub>r</sub> &middot; c<sub>r</sub> &middot; &theta;<sub>r</sub> = m<sub>a</sub> &middot; c<sub>a</sub> &middot; &theta;<sub>a</sub></div>
+                <div class="font-bold text-emerald-900 bg-white/60 py-1 px-2 rounded mt-1 border border-amber-300">
+                  m<sub>r</sub> &middot; c<sub>r</sub> &middot; (&theta;<sub>i,r</sub> - &theta;<sub>f</sub>) = m<sub>a</sub> &middot; c<sub>a</sub> &middot; (&theta;<sub>f</sub> - &theta;<sub>i,a</sub>)
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 1: SUBSTITUTE PARAMETER VALUES -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                STEP 1: SUBSTITUTE PARAMETER VALUES
+              </span>
+              <div id="m2_step1" class="font-mono text-xs text-slate-800 space-y-1.5 bg-white p-3 rounded-lg border border-slate-200">
+                <!-- Injected via recalculate() -->
+              </div>
+            </div>
+
+            <!-- STEP 2: EXPAND BRACKETS (EXPANSION) -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                STEP 2: EXPAND BRACKETS (EXPANSION)
+              </span>
+              <div id="m2_step2" class="font-mono text-xs text-slate-800 space-y-1 bg-white p-3 rounded-lg border border-slate-200">
+                <!-- Injected via recalculate() -->
+              </div>
+            </div>
+
+            <!-- STEP 3: MOVE θf TO ONE SIDE -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                STEP 3: MOVE &theta;<sub>f</sub> TO ONE SIDE
+              </span>
+              <div id="m2_step3" class="font-mono text-xs text-slate-800 space-y-1 bg-white p-3 rounded-lg border border-slate-200">
+                <!-- Injected via recalculate() -->
+              </div>
+            </div>
+          </div>
+
+          <!-- ANSWER BOX & 4 LEGEND BOXES METHOD 2 -->
+          <div class="space-y-4 pt-2 border-t border-emerald-100">
+            <!-- Final Answer Method 2 -->
+            <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3 flex items-center justify-between">
+              <div>
+                <div class="text-xs font-bold text-emerald-900">Final Temperature &theta;<sub>f</sub> (Method 2):</div>
+                <div class="text-[10px] text-emerald-700">Principle of Heat Released = Heat Absorbed</div>
+              </div>
+              <div class="text-xl font-black font-mono text-emerald-900" id="m2_finalBadge">
+                43.33 °C
+              </div>
+            </div>
+
+            <!-- 4 LEGEND BOXES METHOD 2 -->
+            <div class="grid grid-cols-4 gap-2 text-center select-none">
+              <!-- Qr -->
+              <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
+                <div class="font-bold text-amber-700 font-mono text-xs sm:text-sm">Q<sub>r</sub></div>
+                <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Released</div>
+              </div>
+              <!-- Qa -->
+              <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
+                <div class="font-bold text-emerald-700 font-mono text-xs sm:text-sm">Q<sub>a</sub></div>
+                <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Absorbed</div>
+              </div>
+              <!-- θf -->
+              <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
+                <div class="font-bold text-amber-700 font-mono text-xs sm:text-sm">&theta;<sub>f</sub></div>
+                <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Final temp</div>
+              </div>
+              <!-- θi -->
+              <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-xs">
+                <div class="font-bold text-slate-900 font-mono text-xs sm:text-sm">&theta;<sub>i</sub></div>
+                <div class="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">Initial temp</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- OFFICIAL FOOTER: POLITEKNIK PORT DICKSON                 -->
+  <!-- ======================================================== -->
+  <footer class="mt-10 border-t border-slate-200 bg-white/80 backdrop-blur-xs py-5 px-4 text-center">
+    <div class="max-w-4xl mx-auto flex flex-col items-center justify-center space-y-1 text-slate-700">
+      <div class="text-xs sm:text-sm font-extrabold tracking-wider uppercase text-slate-900 flex items-center gap-1.5">
+        <i class="fa-solid fa-shield-halved text-emerald-600 text-xs"></i>
+        <span>MOHDSAIFULPAHRUDIN</span>
+      </div>
+      <p class="text-[11px] sm:text-xs text-slate-500 font-medium">
+        &copy; 2026 Politeknik Port Dickson &bull; All Rights Reserved
+      </p>
+    </div>
+  </footer>
+
+  <!-- Custom Security Toast Popup (Tidak menggunakan alert) -->
+  <div id="securityToast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 ease-out bg-slate-900/95 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700/80 flex items-center gap-3 max-w-sm">
+    <div class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+      <i class="fa-solid fa-lock text-sm"></i>
+    </div>
+    <div class="text-left">
+      <div class="text-xs font-bold text-slate-100 leading-tight">Protected Content</div>
+      <div class="text-[11px] text-slate-400 leading-tight mt-0.5">&copy; 2026 MOHDSAIFULPAHRUDIN &bull; Source & design are copyrighted.</div>
+    </div>
+  </div>
+
+  <script>
+    // --- SECURITY & ANTI-TAMPER / ANTI-COPY SYSTEM ---
+    let toastTimeout = null;
+    function triggerSecurityToast(e) {
+      if (e) {
+        e.preventDefault();
+      }
+      const toast = document.getElementById('securityToast');
+      if (!toast) return false;
+
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 2500);
+
+      return false;
+    }
+
+    // Sekat pintasan papan kekunci biasa bagi inspect/copy/view source
+    document.addEventListener('keydown', function(e) {
+      // F12 (DevTools)
+      if (e.key === 'F12' || e.keyCode === 123) {
+        triggerSecurityToast(e);
+        return false;
+      }
+      // Ctrl+Shift+I / Cmd+Opt+I (Inspect)
+      // Ctrl+Shift+J / Cmd+Opt+J (Console)
+      // Ctrl+Shift+C / Cmd+Opt+C (Inspect Element)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+        triggerSecurityToast(e);
+        return false;
+      }
+      // Ctrl+U / Cmd+Opt+U (View Source)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) {
+        triggerSecurityToast(e);
+        return false;
+      }
+      // Ctrl+S / Cmd+S (Save Page)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+        triggerSecurityToast(e);
+        return false;
+      }
+    });
+
+    // Mesej amaran hak cipta dalam Console Log
+    console.log(
+      '%cNOTICE: Protected Educational Application\n%c© 2026 MOHDSAIFULPAHRUDIN • Politeknik Port Dickson. All rights reserved.\nUnauthorized reproduction, scraping, or distribution of this code/layout is prohibited.',
+      'color: #0284c7; font-size: 14px; font-weight: bold;',
+      'color: #64748b; font-size: 11px;'
+    );
+
+    let materialName1 = 'Hot Water';
+    let materialName2 = 'Cold Water';
+
+    const presets = {
+      water_mix: {
+        name1: 'Hot Water', m1: 0.5, c1: 4200, t1: 80,
+        name2: 'Cold Water', m2: 1.0, c2: 4200, t2: 25
+      },
+      copper_water: {
+        name1: 'Hot Copper', m1: 0.8, c1: 390, t1: 100,
+        name2: 'Cold Water', m2: 0.4, c2: 4200, t2: 20
+      },
+      alu_oil: {
+        name1: 'Hot Aluminium', m1: 0.6, c1: 900, t1: 95,
+        name2: 'Cold Oil', m2: 1.2, c2: 2000, t2: 28
+      }
+    };
+
+    function setPreset(type) {
+      const p = presets[type];
+      if (!p) return;
+      materialName1 = p.name1;
+      materialName2 = p.name2;
+
+      document.getElementById('inputM1').value = p.m1;
+      document.getElementById('inputC1').value = p.c1;
+      document.getElementById('inputT1').value = p.t1;
+
+      document.getElementById('inputM2').value = p.m2;
+      document.getElementById('inputC2').value = p.c2;
+      document.getElementById('inputT2').value = p.t2;
+
+      recalculate();
+    }
+
+    function setMaterial(objectNum, matName, cVal) {
+      if (objectNum === 1) {
+        materialName1 = matName;
+        document.getElementById('inputC1').value = cVal;
+      } else {
+        materialName2 = matName;
+        document.getElementById('inputC2').value = cVal;
+      }
+      recalculate();
+    }
+
+    function resetDefaults() {
+      setPreset('water_mix');
+    }
+
+    function fmt(n, decimals = 2) {
+      if (isNaN(n) || !isFinite(n)) return '0';
+      if (Math.abs(n - Math.round(n)) < 0.0001) {
+        return Math.round(n).toString();
+      }
+      return Number(n.toFixed(decimals)).toString();
+    }
+
+    function recalculate() {
+      const m1 = parseFloat(document.getElementById('inputM1').value);
+      const c1 = parseFloat(document.getElementById('inputC1').value);
+      const t1 = parseFloat(document.getElementById('inputT1').value);
+
+      const m2 = parseFloat(document.getElementById('inputM2').value);
+      const c2 = parseFloat(document.getElementById('inputC2').value);
+      const t2 = parseFloat(document.getElementById('inputT2').value);
+
+      const errorAlert = document.getElementById('errorAlert');
+      const errorMsg = document.getElementById('errorMessage');
+
+      if (isNaN(m1) || isNaN(c1) || isNaN(t1) || isNaN(m2) || isNaN(c2) || isNaN(t2)) {
+        errorAlert.classList.remove('hidden');
+        errorMsg.innerText = 'Please ensure all numeric fields are filled in correctly.';
+        return;
+      }
+
+      if (m1 <= 0 || c1 <= 0 || m2 <= 0 || c2 <= 0) {
+        errorAlert.classList.remove('hidden');
+        errorMsg.innerText = 'Mass (m) and specific heat capacity (c) must be greater than 0.';
+        return;
+      }
+
+      errorAlert.classList.add('hidden');
+
+      document.getElementById('dispName1').innerText = materialName1;
+      document.getElementById('dispName2').innerText = materialName2;
+
+      // Update Diagram Elements at Top
+      const diagName1 = document.getElementById('diagName1');
+      const diagName2 = document.getElementById('diagName2');
+      const diagTemp1 = document.getElementById('diagTemp1');
+      const diagTemp2 = document.getElementById('diagTemp2');
+      const diagM1 = document.getElementById('diagM1');
+      const diagM2 = document.getElementById('diagM2');
+      const diagTf = document.getElementById('diagTf');
+
+      if (diagName1) diagName1.innerText = materialName1;
+      if (diagName2) diagName2.innerText = materialName2;
+      if (diagTemp1) diagTemp1.innerText = `${fmt(t1)} °C`;
+      if (diagTemp2) diagTemp2.innerText = `${fmt(t2)} °C`;
+      if (diagM1) diagM1.innerText = `${fmt(m1)} kg`;
+      if (diagM2) diagM2.innerText = `${fmt(m2)} kg`;
+
+      const C1 = m1 * c1; // Hot Capacity
+      const C2 = m2 * c2; // Cold Capacity
+
+      // Final Equilibrium Temperature
+      const Tf = (C1 * t1 + C2 * t2) / (C1 + C2);
+
+      if (diagTf) diagTf.innerText = `${fmt(Tf, 2)} °C`;
+      
+      const svgCenterTf = document.getElementById('svgCenterTf');
+      if (svgCenterTf) svgCenterTf.innerText = `${fmt(Tf, 2)}°C`;
+
+      // Update Compact Result Bar
+      document.getElementById('compactResultTf').innerText = fmt(Tf, 2);
+
+      // Final Temperature Badges at Card Bottoms
+      const m1FinalBadge = document.getElementById('m1_finalBadge');
+      const m2FinalBadge = document.getElementById('m2_finalBadge');
+      if (m1FinalBadge) m1FinalBadge.innerText = `${fmt(Tf, 2)} °C`;
+      if (m2FinalBadge) m2FinalBadge.innerText = `${fmt(Tf, 2)} °C`;
+
+      const prod1 = C1 * t1;
+      const prod2 = C2 * t2;
+      const sumC = C1 + C2;
+      const sumProd = prod1 + prod2;
+
+      // ====================================================
+      // METHOD 1: HEATING + COOLING = 0
+      // ====================================================
+      const tfHtml = `<span class="symbol-theta">&theta;<sub>f</sub></span>`;
+      
+      document.getElementById('m1_step1').innerHTML = `
+        <div class="text-slate-500 text-[11px]">
+          Substitute: m₁=${fmt(m1)}, c₁=${fmt(c1)}, &theta;<sub>i1</sub>=${fmt(t1)} &bull; m₂=${fmt(m2)}, c₂=${fmt(c2)}, &theta;<sub>i2</sub>=${fmt(t2)}
+        </div>
+        <div class="font-bold text-indigo-950">
+          [(${fmt(m1)})(${fmt(c1)})(${tfHtml} - ${fmt(t1)})] + [(${fmt(m2)})(${fmt(c2)})(${tfHtml} - ${fmt(t2)})] = 0
+        </div>
+      `;
+
+      // Direct expansion with brackets around numbers, theta_f outside
+      document.getElementById('m1_step2').innerHTML = `
+        <div>(${fmt(C1)})(${tfHtml} - ${fmt(t1)}) + (${fmt(C2)})(${tfHtml} - ${fmt(t2)}) = 0</div>
+        <div>[(${fmt(C1)}) &times; ${tfHtml}] - [${fmt(C1)} &times; ${fmt(t1)}] + [(${fmt(C2)}) &times; ${tfHtml}] - [${fmt(C2)} &times; ${fmt(t2)}] = 0</div>
+        <div class="font-bold text-indigo-950">(${fmt(C1)})${tfHtml} - (${fmt(prod1)}) + (${fmt(C2)})${tfHtml} - (${fmt(prod2)}) = 0</div>
+      `;
+
+      document.getElementById('m1_step3').innerHTML = `
+        <div class="text-slate-500 text-[11px] mb-1">Group ${tfHtml} terms and numerical constants:</div>
+        <div>[(${fmt(C1)}) + (${fmt(C2)})]${tfHtml} - [(${fmt(prod1)}) + (${fmt(prod2)})] = 0</div>
+        <div>(${fmt(sumC)})${tfHtml} - (${fmt(sumProd)}) = 0</div>
+        <div>(${fmt(sumC)})${tfHtml} = (${fmt(sumProd)})</div>
+        <div>${tfHtml} = (${fmt(sumProd)}) &divide; (${fmt(sumC)})</div>
+        <div class="font-bold text-amber-900 mt-1 text-xs sm:text-sm bg-amber-100/60 p-1.5 rounded border border-amber-300 inline-block">
+          &rArr; ${tfHtml} = ${fmt(Tf, 2)} &deg;C
+        </div>
+      `;
+
+      // ====================================================
+      // METHOD 2: Q_released = Q_absorbed
+      // ====================================================
+      document.getElementById('m2_step1').innerHTML = `
+        <div class="text-slate-500 text-[11px]">
+          Substitute: Hot: m<sub>r</sub>=${fmt(m1)}, c<sub>r</sub>=${fmt(c1)}, &theta;<sub>i,r</sub>=${fmt(t1)} | Cold: m<sub>a</sub>=${fmt(m2)}, c<sub>a</sub>=${fmt(c2)}, &theta;<sub>i,a</sub>=${fmt(t2)}
+        </div>
+        <div class="font-bold text-emerald-950">
+          (${fmt(m1)})(${fmt(c1)})(${fmt(t1)} - ${tfHtml}) = (${fmt(m2)})(${fmt(c2)})(${tfHtml} - ${fmt(t2)})
+        </div>
+      `;
+
+      // Direct expansion with brackets around numbers, theta_f outside
+      document.getElementById('m2_step2').innerHTML = `
+        <div>(${fmt(C1)})(${fmt(t1)} - ${tfHtml}) = (${fmt(C2)})(${tfHtml} - ${fmt(t2)})</div>
+        <div>[${fmt(C1)} &times; ${fmt(t1)}] - [(${fmt(C1)}) &times; ${tfHtml}] = [(${fmt(C2)}) &times; ${tfHtml}] - [${fmt(C2)} &times; ${fmt(t2)}]</div>
+        <div class="font-bold text-emerald-950">(${fmt(prod1)}) - (${fmt(C1)})${tfHtml} = (${fmt(C2)})${tfHtml} - (${fmt(prod2)})</div>
+      `;
+
+      document.getElementById('m2_step3').innerHTML = `
+        <div class="text-slate-500 text-[11px] mb-1">Move ${tfHtml} to the right side, constants to the left side:</div>
+        <div>(${fmt(prod1)}) + (${fmt(prod2)}) = (${fmt(C2)})${tfHtml} + (${fmt(C1)})${tfHtml}</div>
+        <div>(${fmt(sumProd)}) = [(${fmt(C2)}) + (${fmt(C1)})]${tfHtml}</div>
+        <div>(${fmt(sumProd)}) = (${fmt(sumC)})${tfHtml}</div>
+        <div>${tfHtml} = (${fmt(sumProd)}) &divide; (${fmt(sumC)})</div>
+        <div class="font-bold text-emerald-900 mt-1 text-xs sm:text-sm bg-emerald-100/60 p-1.5 rounded border border-emerald-300 inline-block">
+          &rArr; ${tfHtml} = ${fmt(Tf, 2)} &deg;C
+        </div>
+      `;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      recalculate();
+    });
+  </script>
+</body>
+</html>
