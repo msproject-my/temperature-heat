@@ -97,6 +97,11 @@
           </div>
         </div>
 
+        <button id="logoutBtn" onclick="handleLogout()" class="hidden items-center gap-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold px-3.5 py-2 rounded-xl transition">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Logout</span>
+        </button>
+
         <button id="mainLoginBtn" onclick="openLoginModal()" class="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md transition">
           <i class="fa-solid fa-right-to-bracket text-xs"></i>
           <span>Login</span>
@@ -268,6 +273,16 @@
           <i id="btnSpinner" class="fa-solid fa-circle-notch fa-spin hidden"></i>
         </button>
 
+        <!-- Live Diagnostics Link -->
+        <div class="text-center pt-2">
+          <button 
+            type="button" 
+            onclick="testGSheetConnection()" 
+            class="text-[11px] text-slate-500 hover:text-sky-600 underline font-medium">
+            <i class="fa-solid fa-wrench mr-1"></i> Test GSheet Sync Connection
+          </button>
+        </div>
+
       </form>
     </div>
   </div>
@@ -350,12 +365,25 @@
     </div>
   </div>
 
+  <!-- HIDDEN IFRAME PIPELINE (Bypasses Browser CORS/Redirect Restrictions 100%) -->
+  <iframe name="gsheet_sink_frame" id="gsheet_sink_frame" style="display:none; width:0; height:0; border:0;"></iframe>
+  <form id="gsheetDirectForm" method="POST" target="gsheet_sink_frame" style="display:none;">
+    <input type="hidden" name="fullName" id="postFullName">
+    <input type="hidden" name="role" id="postRole">
+    <input type="hidden" name="studentId" id="postStudentId">
+    <input type="hidden" name="device" id="postDevice">
+  </form>
+
   <!-- ===================================================================== -->
   <!-- JAVASCRIPT & GOOGLE SHEETS SYNC LOGIC                                 -->
   <!-- ===================================================================== -->
   <script>
     // Live Google Apps Script Web App Endpoint
-    const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwFplgPJgtu32cf-tohTCh0zjP0c4n00eNQeMYcfYw3eadwdMbySH_MwEDsRugRfas/exec";
+    const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzJgFwd6_3elIX2IIIUgaDQxatke14nqFez9pBRQmPKKQKBPD-4pET31aZT-729LVpi/exec";
+
+    // 3 Minutes Inactivity Timeout (3 * 60 * 1000 ms = 180,000 ms)
+    const INACTIVITY_TIMEOUT_MS = 3 * 60 * 1000;
+    let idleTimer = null;
 
     // Session State
     let currentUser = {
@@ -365,7 +393,7 @@
       studentId: ""
     };
 
-    // Restore login session if available
+    // Restore login session or immediately popup login if unauthenticated
     window.addEventListener('DOMContentLoaded', () => {
       const savedUser = sessionStorage.getItem('portal_user');
       if (savedUser) {
@@ -373,21 +401,101 @@
           currentUser = JSON.parse(savedUser);
           if (currentUser.isLoggedIn) {
             updateHeaderUI();
+            startInactivityTimer();
+            return;
           }
         } catch (e) {
           console.error("Session parse error", e);
         }
       }
+      
+      // Auto popup login modal immediately on load if not logged in
+      setTimeout(() => {
+        openLoginModal();
+      }, 300);
     });
+
+    // Inactivity Watcher (Auto logout after 3 minutes of no interaction)
+    function resetInactivityTimer() {
+      if (!currentUser.isLoggedIn) return;
+      if (idleTimer) clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        handleLogout(true);
+      }, INACTIVITY_TIMEOUT_MS);
+    }
+
+    function startInactivityTimer() {
+      const activityEvents = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+      activityEvents.forEach(evt => {
+        window.addEventListener(evt, resetInactivityTimer, { passive: true });
+      });
+      resetInactivityTimer();
+    }
+
+    function stopInactivityTimer() {
+      if (idleTimer) clearTimeout(idleTimer);
+      const activityEvents = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+      activityEvents.forEach(evt => {
+        window.removeEventListener(evt, resetInactivityTimer);
+      });
+    }
+
+    // Logout Functionality (Manual & Auto)
+    function handleLogout(isAuto = false) {
+      stopInactivityTimer();
+
+      currentUser = {
+        isLoggedIn: false,
+        name: "",
+        role: "",
+        studentId: ""
+      };
+      sessionStorage.removeItem('portal_user');
+
+      // Reset Header UI safely
+      const profileArea = document.getElementById('userProfileArea');
+      if (profileArea) profileArea.classList.add('hidden');
+      
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) logoutBtn.classList.add('hidden');
+
+      const loginBtn = document.getElementById('mainLoginBtn');
+      if (loginBtn) {
+        loginBtn.classList.remove('hidden');
+        loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket text-xs"></i><span>Login</span>';
+        loginBtn.className = "flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md transition";
+      }
+
+      // Reset Form fields
+      const loginForm = document.getElementById('userLoginForm');
+      if (loginForm) loginForm.reset();
+      
+      const studentIdWrapper = document.getElementById('studentIdWrapper');
+      if (studentIdWrapper) studentIdWrapper.classList.add('hidden');
+
+      if (isAuto) {
+        showSecurityToast("Logged out automatically due to 3 minutes of inactivity.");
+      } else {
+        showSecurityToast("You have been logged out successfully.");
+      }
+
+      // Automatically re-trigger login modal
+      setTimeout(() => {
+        openLoginModal();
+      }, 400);
+    }
 
     // Open & Close Modal
     function openLoginModal() {
-      document.getElementById('loginModalOverlay').classList.remove('hidden');
-      document.getElementById('loginFullName').focus();
+      const modal = document.getElementById('loginModalOverlay');
+      if (modal) modal.classList.remove('hidden');
+      const input = document.getElementById('loginFullName');
+      if (input) input.focus();
     }
 
     function closeLoginModal() {
-      document.getElementById('loginModalOverlay').classList.add('hidden');
+      const modal = document.getElementById('loginModalOverlay');
+      if (modal) modal.classList.add('hidden');
     }
 
     // Toggle Student ID input when Role is Student POLIPD
@@ -395,6 +503,8 @@
       const roleSelect = document.getElementById('loginRole');
       const studentIdWrapper = document.getElementById('studentIdWrapper');
       const studentIdInput = document.getElementById('loginStudentId');
+
+      if (!roleSelect || !studentIdWrapper || !studentIdInput) return;
 
       if (roleSelect.value === 'Student POLIPD') {
         studentIdWrapper.classList.remove('hidden');
@@ -406,17 +516,17 @@
       }
     }
 
-    // Submit Login to Google Apps Script
-    async function handleLoginSubmit(event) {
+    // Submit Login to Google Apps Script (TRIPLE FALLBACK PIPELINE)
+    function handleLoginSubmit(event) {
       event.preventDefault();
       
       const nameInput = document.getElementById('loginFullName');
       const roleSelect = document.getElementById('loginRole');
       const studentIdInput = document.getElementById('loginStudentId');
       
-      const name = nameInput.value.trim();
-      const role = roleSelect.value;
-      const studentId = studentIdInput.value.trim();
+      const name = nameInput ? nameInput.value.trim() : "";
+      const role = roleSelect ? roleSelect.value : "";
+      const studentId = studentIdInput ? studentIdInput.value.trim() : "";
 
       const submitBtn = document.getElementById('loginSubmitBtn');
       const btnText = document.getElementById('btnText');
@@ -429,13 +539,13 @@
 
       if (role === 'Student POLIPD' && !studentId) {
         showFeedback("Please enter your Student ID.", "error");
-        studentIdInput.focus();
+        if (studentIdInput) studentIdInput.focus();
         return;
       }
 
-      submitBtn.disabled = true;
-      btnText.textContent = "Connecting to Sheets...";
-      btnSpinner.classList.remove('hidden');
+      if (submitBtn) submitBtn.disabled = true;
+      if (btnText) btnText.textContent = "Logging in...";
+      if (btnSpinner) btnSpinner.classList.remove('hidden');
 
       currentUser.isLoggedIn = true;
       currentUser.name = name;
@@ -443,86 +553,123 @@
       currentUser.studentId = (role === 'Student POLIPD') ? studentId : '-';
       sessionStorage.setItem('portal_user', JSON.stringify(currentUser));
 
+      const deviceString = navigator.userAgent.substring(0, 90);
+
+      // PIPELINE 1: Direct Form Submission to Hidden Iframe
       try {
-        const payloadData = {
-          fullName: name,
-          role: role,
-          studentId: currentUser.studentId,
-          device: navigator.userAgent.substring(0, 90)
-        };
-
-        // Method 1: Form-urlencoded POST (no-cors)
-        const postParams = new URLSearchParams();
-        for (const key in payloadData) {
-          postParams.append(key, payloadData[key]);
+        const hiddenForm = document.getElementById('gsheetDirectForm');
+        if (hiddenForm) {
+          hiddenForm.action = GOOGLE_SHEET_WEBAPP_URL;
+          document.getElementById('postFullName').value = name;
+          document.getElementById('postRole').value = role;
+          document.getElementById('postStudentId').value = currentUser.studentId;
+          document.getElementById('postDevice').value = deviceString;
+          hiddenForm.submit();
         }
-
-        await fetch(GOOGLE_SHEET_WEBAPP_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: postParams.toString()
-        });
-
-        // Method 2: GET fallback ping to ensure recording
-        const backupUrl = `${GOOGLE_SHEET_WEBAPP_URL}?fullName=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}&studentId=${encodeURIComponent(currentUser.studentId)}&device=${encodeURIComponent(payloadData.device)}`;
-        const pingImg = new Image();
-        pingImg.src = backupUrl;
-
-        showFeedback("Login successful! Synced to Google Sheet.", "success");
-        updateHeaderUI();
-
       } catch (err) {
-        console.warn("GSheet submission note:", err);
-        showFeedback("Login verified!", "success");
-        updateHeaderUI();
+        console.warn("Iframe form error:", err);
       }
 
+      // PIPELINE 2: Fetch POST with mode no-cors
+      try {
+        const formData = new URLSearchParams();
+        formData.append("fullName", name);
+        formData.append("role", role);
+        formData.append("studentId", currentUser.studentId);
+        formData.append("device", deviceString);
+
+        fetch(GOOGLE_SHEET_WEBAPP_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: formData.toString()
+        }).catch(() => {});
+      } catch (fetchErr) {
+        console.warn("Fetch POST error:", fetchErr);
+      }
+
+      // PIPELINE 3: Secondary Image Ping via GET
+      try {
+        const queryParams = `fullName=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}&studentId=${encodeURIComponent(currentUser.studentId)}&device=${encodeURIComponent(deviceString)}`;
+        const pingBeacon = new Image();
+        pingBeacon.src = `${GOOGLE_SHEET_WEBAPP_URL}?${queryParams}&_t=${Date.now()}`;
+      } catch (beaconErr) {
+        console.warn("Beacon error:", beaconErr);
+      }
+
+      showFeedback("Login successful! Welcome.", "success");
+      updateHeaderUI();
+      startInactivityTimer();
+
       setTimeout(() => {
-        submitBtn.disabled = false;
-        btnText.textContent = "Login";
-        btnSpinner.classList.add('hidden');
+        if (submitBtn) submitBtn.disabled = false;
+        if (btnText) btnText.textContent = "Login";
+        if (btnSpinner) btnSpinner.classList.add('hidden');
         closeLoginModal();
-      }, 1200);
+      }, 500);
+    }
+
+    // Direct Diagnostic Test function
+    function testGSheetConnection() {
+      const fb = document.getElementById('loginFeedback');
+      showFeedback("Testing connection to Google Sheets...", "info");
+
+      const testUrl = `${GOOGLE_SHEET_WEBAPP_URL}?fullName=TEST_DIAGNOSTIC&role=Tester&studentId=9999&_t=${Date.now()}`;
+      
+      // Open in a popup or new tab directly to show actual Google server response
+      window.open(testUrl, '_blank', 'width=500,height=300');
+      showFeedback("Opened test in new tab. Check your Google Sheet now!", "success");
     }
 
     // Update Header UI on Login
     function updateHeaderUI() {
       if (!currentUser.isLoggedIn) return;
 
-      document.getElementById('headerUserName').textContent = currentUser.name;
-      document.getElementById('headerUserRole').textContent = currentUser.role;
-      document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+      const nameEl = document.getElementById('headerUserName');
+      if (nameEl) nameEl.textContent = currentUser.name;
+
+      const roleEl = document.getElementById('headerUserRole');
+      if (roleEl) roleEl.textContent = currentUser.role;
+
+      const avatarEl = document.getElementById('userAvatar');
+      if (avatarEl) avatarEl.textContent = currentUser.name.charAt(0).toUpperCase();
 
       const badgeId = document.getElementById('headerUserIdBadge');
-      if (currentUser.studentId && currentUser.studentId !== '-') {
-        badgeId.textContent = currentUser.studentId;
-        badgeId.classList.remove('hidden');
-      } else {
-        badgeId.classList.add('hidden');
+      if (badgeId) {
+        if (currentUser.studentId && currentUser.studentId !== '-') {
+          badgeId.textContent = currentUser.studentId;
+          badgeId.classList.remove('hidden');
+        } else {
+          badgeId.classList.add('hidden');
+        }
       }
 
-      document.getElementById('userProfileArea').classList.remove('hidden');
-      
+      const profileArea = document.getElementById('userProfileArea');
+      if (profileArea) profileArea.classList.remove('hidden');
+
       const loginBtn = document.getElementById('mainLoginBtn');
-      loginBtn.innerHTML = '<i class="fa-solid fa-check text-xs"></i><span>Logged In</span>';
-      loginBtn.classList.replace('bg-sky-600', 'bg-emerald-600');
-      loginBtn.classList.replace('hover:bg-sky-700', 'hover:bg-emerald-700');
+      if (loginBtn) loginBtn.classList.add('hidden');
+
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.classList.remove('hidden');
+        logoutBtn.classList.add('flex');
+      }
     }
 
-    // Modal Status Feedback
-    function showFeedback(msg, type) {
+    function showFeedback(message, type = "info") {
       const fb = document.getElementById('loginFeedback');
-      fb.textContent = msg;
-      fb.classList.remove('hidden', 'bg-rose-100', 'text-rose-700', 'bg-emerald-100', 'text-emerald-700');
-
+      if (!fb) return;
+      fb.classList.remove('hidden', 'bg-rose-50', 'text-rose-600', 'border-rose-200', 'bg-emerald-50', 'text-emerald-600', 'border-emerald-200');
+      fb.classList.add('border');
       if (type === 'error') {
-        fb.classList.add('bg-rose-100', 'text-rose-700');
+        fb.classList.add('bg-rose-50', 'text-rose-600', 'border-rose-200');
       } else {
-        fb.classList.add('bg-emerald-100', 'text-emerald-700');
+        fb.classList.add('bg-emerald-50', 'text-emerald-600', 'border-emerald-200');
       }
+      fb.textContent = message;
     }
 
     // Safe Navigation to Modules
@@ -532,47 +679,60 @@
         openLoginModal();
         return;
       }
-      window.location.href = pageUrl;
+
+      if (!pageUrl || typeof pageUrl !== 'string' || pageUrl.trim() === '' || pageUrl === '#') {
+        console.warn("navigateToModule called with an invalid or empty URL:", pageUrl);
+        showSecurityToast("Module page is not configured yet.");
+        return;
+      }
+
+      const targetUrl = pageUrl.trim();
+
+      if (window.location.protocol === 'blob:') {
+        console.info(`Sandbox preview detected. Target module: ${targetUrl}`);
+        showSecurityToast(`Navigating to ${targetUrl} (In deployment, this opens the sub-page)`);
+        return;
+      }
+
+      try {
+        window.location.href = targetUrl;
+      } catch (err) {
+        console.error("Navigation failed:", err);
+        showSecurityToast(`Unable to open ${targetUrl}`);
+      }
     }
 
     // =====================================================================
     // SECURITY & ANTI-TAMPER SHIELD
     // =====================================================================
     
-    // 1. Disable Right-Click Context Menu
     document.addEventListener('contextmenu', function(e) {
       e.preventDefault();
       showSecurityToast("Right-click context menu is disabled.");
       return false;
     });
 
-    // 2. Block Inspect, DevTools, View Source, and Save shortcuts
     document.addEventListener('keydown', function(e) {
-      // F12
       if (e.keyCode === 123) {
         e.preventDefault();
         showSecurityToast("Developer tools (F12) are disabled.");
         return false;
       }
-      // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
       if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
         e.preventDefault();
         showSecurityToast("Developer tools inspection is disabled.");
         return false;
       }
-      // Ctrl+U (View Source)
       if (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 117)) {
         e.preventDefault();
         showSecurityToast("Viewing source code is disabled.");
         return false;
       }
-      // Ctrl+S (Save Page)
       if (e.ctrlKey && (e.keyCode === 83 || e.keyCode === 115)) {
         e.preventDefault();
         showSecurityToast("Saving this page is disabled.");
         return false;
       }
-      // Mac Command Keys (Cmd+Opt+I, Cmd+Opt+J, Cmd+Opt+C, Cmd+U)
       if (e.metaKey && e.altKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
         e.preventDefault();
         showSecurityToast("Developer tools are disabled.");
@@ -584,13 +744,11 @@
       }
     });
 
-    // 3. Disable Dragging Content
     document.addEventListener('dragstart', function(e) {
       e.preventDefault();
       return false;
     });
 
-    // Display Security Toast
     let toastTimeout;
     function showSecurityToast(message) {
       const toast = document.getElementById('securityToast');
@@ -605,10 +763,6 @@
         toast.classList.add('translate-y-24', 'opacity-0');
       }, 2800);
     }
-
-    // Console Warning Notice
-    console.log("%c⛔ SECURITY & COPYRIGHT NOTICE", "color: red; font-size: 20px; font-weight: bold;");
-    console.log("%cThis portal and its source code are copyright protected. Unauthorized duplication is prohibited.", "color: #475569; font-size: 13px;");
   </script>
 </body>
 </html>
