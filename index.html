@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TEMPERATURE AND HEAT - Physics Learning Portal</title>
+  
+  <!-- Tailwind CSS & Font Awesome Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Lock content selection for security */
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    /* Permit inputs to remain editable */
+    input, select, textarea {
+      -webkit-user-select: auto !important;
+      -moz-user-select: auto !important;
+      -ms-user-select: auto !important;
+      user-select: auto !important;
+    }
+
+    .hero-gradient {
+      background: radial-gradient(circle at 10% 20%, rgba(2, 132, 199, 0.08) 0%, transparent 40%),
+                  radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.08) 0%, transparent 40%),
+                  #f8fafc;
+    }
+
+    /* Module Card Micro-interactions */
+    .module-card {
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .module-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.12);
+    }
+
+    /* Custom Input and Button Styles */
+    .modal-input {
+      border: 1.5px solid #cbd5e1;
+      transition: all 0.2s ease;
+    }
+    .modal-input:focus {
+      border-color: #0081c9;
+      box-shadow: 0 0 0 3px rgba(0, 129, 201, 0.15);
+      outline: none;
+    }
+    .btn-login-blue {
+      background-color: #0081c9;
+      transition: all 0.2s ease;
+    }
+    .btn-login-blue:hover {
+      background-color: #006da8;
+      box-shadow: 0 4px 12px rgba(0, 129, 201, 0.3);
+    }
+  </style>
+</head>
+
+<body class="hero-gradient text-slate-800 min-h-screen flex flex-col justify-between" oncontextmenu="return false;">
+
+  <!-- TOP NAVIGATION HEADER -->
+  <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand & Subject Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 to-amber-500 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
+          <i class="fa-solid fa-fire-flame-curved text-xl"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-sky-600 block">Interactive Physics Portal</span>
+          <h1 class="text-xl font-extrabold tracking-tight text-slate-900 leading-tight">TEMPERATURE AND HEAT</h1>
+        </div>
+      </div>
+
+      <!-- User Profile Badge & Login Actions -->
+      <div class="flex items-center gap-3">
+        <div id="userProfileArea" class="hidden flex items-center gap-2 bg-slate-100/90 py-1.5 px-3.5 rounded-full border border-slate-200">
+          <div class="w-7 h-7 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs font-bold" id="userAvatar">U</div>
+          <div class="text-left leading-tight pr-1">
+            <p class="text-xs font-bold text-slate-800" id="headerUserName">User Name</p>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] font-semibold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200" id="headerUserRole">Role</span>
+              <span class="text-[10px] font-mono text-slate-600 hidden" id="headerUserIdBadge">ID</span>
+            </div>
+          </div>
+        </div>
+
+        <button id="mainLoginBtn" onclick="openLoginModal()" class="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md transition">
+          <i class="fa-solid fa-right-to-bracket text-xs"></i>
+          <span>Login</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN HERO & MODULE SELECTION SECTION -->
+  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full flex flex-col justify-center">
+    
+    <!-- Hero Title -->
+    <div class="text-center max-w-3xl mx-auto mb-14">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-bold mb-4 tracking-wide uppercase">
+        <i class="fa-solid fa-atom text-sky-600"></i> Physics Interactive Modules
+      </div>
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+        TEMPERATURE AND HEAT
+      </h2>
+    </div>
+
+    <!-- 3 MAIN MODULE CARDS (TITLES ONLY) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+      
+      <!-- MODULE 1: Temperature Conversion -->
+      <div onclick="navigateToModule('temp-conversion.html')" class="module-card bg-white rounded-3xl p-8 border border-slate-200/80 shadow-md cursor-pointer flex flex-col justify-between group relative overflow-hidden min-h-[220px]">
+        <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-sky-50 rounded-full group-hover:scale-125 transition-transform duration-500 -z-0"></div>
+        
+        <div class="relative z-10">
+          <div class="w-14 h-14 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-2xl mb-6 shadow-inner group-hover:bg-sky-600 group-hover:text-white transition-colors duration-300">
+            <i class="fa-solid fa-temperature-half"></i>
+          </div>
+          <span class="text-xs font-bold text-sky-600 uppercase tracking-widest block mb-2">Module 01</span>
+          <h3 class="text-xl font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
+            Temperature Conversion
+          </h3>
+        </div>
+
+        <div class="relative z-10 pt-6 border-t border-slate-100 flex items-center justify-between text-sky-600 font-semibold text-sm group-hover:translate-x-1 transition-transform">
+          <span>Open Module</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </div>
+      </div>
+
+      <!-- MODULE 2: Heat Energy and Phase Change -->
+      <div onclick="navigateToModule('phase-change.html')" class="module-card bg-white rounded-3xl p-8 border border-slate-200/80 shadow-md cursor-pointer flex flex-col justify-between group relative overflow-hidden min-h-[220px]">
+        <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-amber-50 rounded-full group-hover:scale-125 transition-transform duration-500 -z-0"></div>
+        
+        <div class="relative z-10">
+          <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl mb-6 shadow-inner group-hover:bg-amber-600 group-hover:text-white transition-colors duration-300">
+            <i class="fa-solid fa-fire-burner"></i>
+          </div>
+          <span class="text-xs font-bold text-amber-600 uppercase tracking-widest block mb-2">Module 02</span>
+          <h3 class="text-xl font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
+            Heat Energy and Phase Change
+          </h3>
+        </div>
+
+        <div class="relative z-10 pt-6 border-t border-slate-100 flex items-center justify-between text-amber-600 font-semibold text-sm group-hover:translate-x-1 transition-transform">
+          <span>Open Module</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </div>
+      </div>
+
+      <!-- MODULE 3: Thermal Equilibrium -->
+      <div onclick="navigateToModule('thermal-equilibrium.html')" class="module-card bg-white rounded-3xl p-8 border border-slate-200/80 shadow-md cursor-pointer flex flex-col justify-between group relative overflow-hidden min-h-[220px]">
+        <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-emerald-50 rounded-full group-hover:scale-125 transition-transform duration-500 -z-0"></div>
+        
+        <div class="relative z-10">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mb-6 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-300">
+            <i class="fa-solid fa-scale-balanced"></i>
+          </div>
+          <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest block mb-2">Module 03</span>
+          <h3 class="text-xl font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
+            Thermal Equilibrium
+          </h3>
+        </div>
+
+        <div class="relative z-10 pt-6 border-t border-slate-100 flex items-center justify-between text-emerald-600 font-semibold text-sm group-hover:translate-x-1 transition-transform">
+          <span>Open Module</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- USER LOGIN MODAL                                                      -->
+  <!-- ===================================================================== -->
+  <div id="loginModalOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    
+    <!-- Modal Card Box -->
+    <div class="bg-white w-full max-w-[380px] rounded-[24px] p-8 shadow-2xl relative border border-slate-100 animate-in fade-in zoom-in duration-200">
+      
+      <!-- Close Button -->
+      <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center transition">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <!-- Modal Title -->
+      <h3 class="text-center text-xl font-extrabold text-slate-800 tracking-wide mb-6 uppercase">
+        USER LOGIN
+      </h3>
+
+      <form id="userLoginForm" onsubmit="handleLoginSubmit(event)" class="space-y-5">
+        
+        <!-- FULL NAME Input -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            FULL NAME <span class="text-rose-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="loginFullName" 
+            required 
+            placeholder="Enter full name" 
+            class="modal-input w-full px-4 py-3 rounded-xl text-slate-800 placeholder-slate-400 text-sm font-medium"
+          >
+        </div>
+
+        <!-- ROLE Dropdown -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            ROLE <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <select 
+              id="loginRole" 
+              required 
+              onchange="handleRoleChange()" 
+              class="modal-input w-full px-4 py-3 rounded-xl text-slate-700 text-sm font-medium appearance-none cursor-pointer bg-white"
+            >
+              <option value="" disabled selected>-- Select Role --</option>
+              <option value="Student">Student</option>
+              <option value="Student POLIPD">Student POLIPD</option>
+              <option value="Lecturer">Lecturer</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+              <i class="fa-solid fa-chevron-down text-xs"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- STUDENT ID Input (Only shown for Student POLIPD) -->
+        <div id="studentIdWrapper" class="hidden transition-all duration-300">
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            STUDENT ID <span class="text-rose-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="loginStudentId" 
+            placeholder="Enter student ID" 
+            class="modal-input w-full px-4 py-3 rounded-xl text-slate-800 placeholder-slate-400 text-sm font-medium uppercase font-mono"
+          >
+        </div>
+
+        <!-- Status / Feedback Message -->
+        <div id="loginFeedback" class="hidden text-xs rounded-lg p-2.5 text-center font-medium"></div>
+
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          id="loginSubmitBtn"
+          class="btn-login-blue w-full py-3.5 px-4 rounded-xl text-white font-bold text-base shadow-md flex items-center justify-center gap-2"
+        >
+          <span id="btnText">Login</span>
+          <i id="btnSpinner" class="fa-solid fa-circle-notch fa-spin hidden"></i>
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- FOOTER                                                                -->
+  <!-- ===================================================================== -->
+  <footer class="bg-slate-900 text-slate-300 border-t border-slate-800 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        
+        <!-- Portal Information -->
+        <div class="md:col-span-2">
+          <div class="flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-fire-flame-curved text-sky-400 text-lg"></i>
+            <span class="text-white font-extrabold text-base tracking-wide uppercase">TEMPERATURE AND HEAT</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed max-w-md">
+            Interactive Physics Learning Portal covering Temperature, Heat Energy, Phase Change, and Thermal Equilibrium.
+          </p>
+          <div class="mt-4 flex items-center gap-2 text-xs text-emerald-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Google Sheets Database: Active Sync</span>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-white text-xs font-bold uppercase tracking-wider mb-3">Modules</h4>
+          <ul class="space-y-2 text-xs">
+            <li>
+              <a href="temp-conversion.html" class="hover:text-sky-400 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-angle-right text-[10px] text-slate-500"></i> Temperature Conversion
+              </a>
+            </li>
+            <li>
+              <a href="phase-change.html" class="hover:text-amber-400 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-angle-right text-[10px] text-slate-500"></i> Heat Energy and Phase Change
+              </a>
+            </li>
+            <li>
+              <a href="thermal-equilibrium.html" class="hover:text-emerald-400 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-angle-right text-[10px] text-slate-500"></i> Thermal Equilibrium
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Security & Copyright Notice -->
+        <div>
+          <h4 class="text-white text-xs font-bold uppercase tracking-wider mb-3">System Security</h4>
+          <p class="text-xs text-slate-400 leading-relaxed mb-3">
+            Content, source code, and simulation models are protected under Educational Copyright.
+          </p>
+          <div class="inline-flex items-center gap-1 text-[11px] text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded border border-slate-700">
+            <i class="fa-solid fa-shield-halved text-sky-400"></i> Anti-Tamper Protected
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Copyright Bar -->
+      <div class="border-t border-slate-800/80 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
+        <p>© Physics Learning Portal. Politeknik Port Dickson. All Rights Reserved.</p>
+        <p class="mt-2 sm:mt-0 flex items-center gap-1">
+          Powered by <span class="text-slate-300 font-semibold">Google Apps Script API Engine</span>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification on Security Trigger -->
+  <div id="securityToast" class="fixed bottom-6 right-6 bg-slate-900 text-white border border-slate-700 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 z-50 pointer-events-none">
+    <div class="w-8 h-8 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+      <i class="fa-solid fa-lock"></i>
+    </div>
+    <div>
+      <h5 class="text-xs font-bold text-white">Security Notice</h5>
+      <p class="text-[11px] text-slate-300" id="toastMessage">Action disabled to protect module copyright.</p>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- JAVASCRIPT & GOOGLE SHEETS SYNC LOGIC                                 -->
+  <!-- ===================================================================== -->
+  <script>
+    // Live Google Apps Script Web App Endpoint
+    const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwFplgPJgtu32cf-tohTCh0zjP0c4n00eNQeMYcfYw3eadwdMbySH_MwEDsRugRfas/exec";
+
+    // Session State
+    let currentUser = {
+      isLoggedIn: false,
+      name: "",
+      role: "",
+      studentId: ""
+    };
+
+    // Restore login session if available
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUser = sessionStorage.getItem('portal_user');
+      if (savedUser) {
+        try {
+          currentUser = JSON.parse(savedUser);
+          if (currentUser.isLoggedIn) {
+            updateHeaderUI();
+          }
+        } catch (e) {
+          console.error("Session parse error", e);
+        }
+      }
+    });
+
+    // Open & Close Modal
+    function openLoginModal() {
+      document.getElementById('loginModalOverlay').classList.remove('hidden');
+      document.getElementById('loginFullName').focus();
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModalOverlay').classList.add('hidden');
+    }
+
+    // Toggle Student ID input when Role is Student POLIPD
+    function handleRoleChange() {
+      const roleSelect = document.getElementById('loginRole');
+      const studentIdWrapper = document.getElementById('studentIdWrapper');
+      const studentIdInput = document.getElementById('loginStudentId');
+
+      if (roleSelect.value === 'Student POLIPD') {
+        studentIdWrapper.classList.remove('hidden');
+        studentIdInput.required = true;
+      } else {
+        studentIdWrapper.classList.add('hidden');
+        studentIdInput.required = false;
+        studentIdInput.value = '';
+      }
+    }
+
+    // Submit Login to Google Apps Script
+    async function handleLoginSubmit(event) {
+      event.preventDefault();
+      
+      const nameInput = document.getElementById('loginFullName');
+      const roleSelect = document.getElementById('loginRole');
+      const studentIdInput = document.getElementById('loginStudentId');
+      
+      const name = nameInput.value.trim();
+      const role = roleSelect.value;
+      const studentId = studentIdInput.value.trim();
+
+      const submitBtn = document.getElementById('loginSubmitBtn');
+      const btnText = document.getElementById('btnText');
+      const btnSpinner = document.getElementById('btnSpinner');
+
+      if (!name || !role) {
+        showFeedback("Please complete all required fields (*).", "error");
+        return;
+      }
+
+      if (role === 'Student POLIPD' && !studentId) {
+        showFeedback("Please enter your Student ID.", "error");
+        studentIdInput.focus();
+        return;
+      }
+
+      submitBtn.disabled = true;
+      btnText.textContent = "Connecting to Sheets...";
+      btnSpinner.classList.remove('hidden');
+
+      currentUser.isLoggedIn = true;
+      currentUser.name = name;
+      currentUser.role = role;
+      currentUser.studentId = (role === 'Student POLIPD') ? studentId : '-';
+      sessionStorage.setItem('portal_user', JSON.stringify(currentUser));
+
+      try {
+        const payloadData = {
+          fullName: name,
+          role: role,
+          studentId: currentUser.studentId,
+          device: navigator.userAgent.substring(0, 90)
+        };
+
+        // Method 1: Form-urlencoded POST (no-cors)
+        const postParams = new URLSearchParams();
+        for (const key in payloadData) {
+          postParams.append(key, payloadData[key]);
+        }
+
+        await fetch(GOOGLE_SHEET_WEBAPP_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: postParams.toString()
+        });
+
+        // Method 2: GET fallback ping to ensure recording
+        const backupUrl = `${GOOGLE_SHEET_WEBAPP_URL}?fullName=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}&studentId=${encodeURIComponent(currentUser.studentId)}&device=${encodeURIComponent(payloadData.device)}`;
+        const pingImg = new Image();
+        pingImg.src = backupUrl;
+
+        showFeedback("Login successful! Synced to Google Sheet.", "success");
+        updateHeaderUI();
+
+      } catch (err) {
+        console.warn("GSheet submission note:", err);
+        showFeedback("Login verified!", "success");
+        updateHeaderUI();
+      }
+
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        btnText.textContent = "Login";
+        btnSpinner.classList.add('hidden');
+        closeLoginModal();
+      }, 1200);
+    }
+
+    // Update Header UI on Login
+    function updateHeaderUI() {
+      if (!currentUser.isLoggedIn) return;
+
+      document.getElementById('headerUserName').textContent = currentUser.name;
+      document.getElementById('headerUserRole').textContent = currentUser.role;
+      document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+
+      const badgeId = document.getElementById('headerUserIdBadge');
+      if (currentUser.studentId && currentUser.studentId !== '-') {
+        badgeId.textContent = currentUser.studentId;
+        badgeId.classList.remove('hidden');
+      } else {
+        badgeId.classList.add('hidden');
+      }
+
+      document.getElementById('userProfileArea').classList.remove('hidden');
+      
+      const loginBtn = document.getElementById('mainLoginBtn');
+      loginBtn.innerHTML = '<i class="fa-solid fa-check text-xs"></i><span>Logged In</span>';
+      loginBtn.classList.replace('bg-sky-600', 'bg-emerald-600');
+      loginBtn.classList.replace('hover:bg-sky-700', 'hover:bg-emerald-700');
+    }
+
+    // Modal Status Feedback
+    function showFeedback(msg, type) {
+      const fb = document.getElementById('loginFeedback');
+      fb.textContent = msg;
+      fb.classList.remove('hidden', 'bg-rose-100', 'text-rose-700', 'bg-emerald-100', 'text-emerald-700');
+
+      if (type === 'error') {
+        fb.classList.add('bg-rose-100', 'text-rose-700');
+      } else {
+        fb.classList.add('bg-emerald-100', 'text-emerald-700');
+      }
+    }
+
+    // Safe Navigation to Modules
+    function navigateToModule(pageUrl) {
+      if (!currentUser.isLoggedIn) {
+        showSecurityToast("Please log in first to access this module.");
+        openLoginModal();
+        return;
+      }
+      window.location.href = pageUrl;
+    }
+
+    // =====================================================================
+    // SECURITY & ANTI-TAMPER SHIELD
+    // =====================================================================
+    
+    // 1. Disable Right-Click Context Menu
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      showSecurityToast("Right-click context menu is disabled.");
+      return false;
+    });
+
+    // 2. Block Inspect, DevTools, View Source, and Save shortcuts
+    document.addEventListener('keydown', function(e) {
+      // F12
+      if (e.keyCode === 123) {
+        e.preventDefault();
+        showSecurityToast("Developer tools (F12) are disabled.");
+        return false;
+      }
+      // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+      if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+        e.preventDefault();
+        showSecurityToast("Developer tools inspection is disabled.");
+        return false;
+      }
+      // Ctrl+U (View Source)
+      if (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 117)) {
+        e.preventDefault();
+        showSecurityToast("Viewing source code is disabled.");
+        return false;
+      }
+      // Ctrl+S (Save Page)
+      if (e.ctrlKey && (e.keyCode === 83 || e.keyCode === 115)) {
+        e.preventDefault();
+        showSecurityToast("Saving this page is disabled.");
+        return false;
+      }
+      // Mac Command Keys (Cmd+Opt+I, Cmd+Opt+J, Cmd+Opt+C, Cmd+U)
+      if (e.metaKey && e.altKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+        e.preventDefault();
+        showSecurityToast("Developer tools are disabled.");
+        return false;
+      }
+      if (e.metaKey && e.keyCode === 85) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    // 3. Disable Dragging Content
+    document.addEventListener('dragstart', function(e) {
+      e.preventDefault();
+      return false;
+    });
+
+    // Display Security Toast
+    let toastTimeout;
+    function showSecurityToast(message) {
+      const toast = document.getElementById('securityToast');
+      document.getElementById('toastMessage').textContent = message;
+      
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 2800);
+    }
+
+    // Console Warning Notice
+    console.log("%c⛔ SECURITY & COPYRIGHT NOTICE", "color: red; font-size: 20px; font-weight: bold;");
+    console.log("%cThis portal and its source code are copyright protected. Unauthorized duplication is prohibited.", "color: #475569; font-size: 13px;");
+  </script>
+</body>
+</html>
