@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Temperature Scale Comparison Simulator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            mercury: '#ef4444',
+            chalkboard: '#0f172a'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+    .thermometer-glass {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(220, 235, 252, 0.45) 50%, rgba(255, 255, 255, 0.8) 100%);
+      box-shadow: inset -3px 0 6px rgba(0,0,0,0.1), inset 3px 0 6px rgba(255,255,255,0.9), 0 8px 20px rgba(0,0,0,0.08);
+      border: 1.5px solid rgba(186, 215, 245, 0.8);
+    }
+    .mercury-glow {
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.65);
+    }
+    .scale-mark {
+      transition: opacity 0.15s ease;
+    }
+    /* Dashed border styling resembling textbook figure */
+    .dashed-board {
+      border: 3.5px dashed #f87171;
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between antialiased">
+
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-500 to-amber-500 flex items-center justify-center text-white shadow-md">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg md:text-xl font-extrabold text-slate-800 leading-tight">Temperature Scale Simulator: Kelvin, Celsius &amp; Fahrenheit</h1>
+          <p class="text-xs text-slate-500">Based on Physics Curricula &amp; Standard Conversion Formulas</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button id="btn-toggle-formula" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5 shadow-sm">
+          <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+          </svg>
+          Formula Map (Figure 2)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6 w-full flex-1 flex flex-col gap-6">
+
+    <!-- Preset Benchmark Buttons -->
+    <section class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200">
+      <div class="flex items-center justify-between flex-wrap gap-2 mb-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Key Benchmarks (Click to Quick-Jump):
+        </span>
+        <span class="text-xs text-slate-400 italic">Primary Reference: <strong class="text-emerald-600">Celsius (°C)</strong></span>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 text-xs">
+        <button onclick="setCelsius(100)" class="preset-btn px-3 py-2 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 font-semibold text-left transition flex flex-col">
+          <span class="font-bold">Boiling Point of Water</span>
+          <span class="text-[11px] opacity-80">100°C | 373.15 K | 212°F</span>
+        </button>
+        <button onclick="setCelsius(37)" class="preset-btn px-3 py-2 rounded-xl border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold text-left transition flex flex-col">
+          <span class="font-bold">Human Body Temp</span>
+          <span class="text-[11px] opacity-80">37°C | 310.15 K | 98.6°F</span>
+        </button>
+        <button onclick="setCelsius(25)" class="preset-btn px-3 py-2 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-left transition flex flex-col">
+          <span class="font-bold">Room Temperature</span>
+          <span class="text-[11px] opacity-80">25°C | 298.15 K | 77°F</span>
+        </button>
+        <button onclick="setCelsius(0)" class="preset-btn px-3 py-2 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-left transition flex flex-col">
+          <span class="font-bold">Freezing Point of Water</span>
+          <span class="text-[11px] opacity-80">0°C | 273.15 K | 32°F</span>
+        </button>
+        <button onclick="setCelsius(-273.15)" class="preset-btn px-3 py-2 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-800 font-semibold text-left transition flex flex-col col-span-2 sm:col-span-1">
+          <span class="font-bold">Absolute Zero</span>
+          <span class="text-[11px] opacity-80">-273.15°C | 0 K | -459.67°F</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Interactive Canvas & Thermometer Board (Faithful to Figure 6.1) -->
+    <div class="relative w-full rounded-3xl dashed-board p-5 sm:p-8 shadow-inner overflow-hidden select-none" id="simulator-board">
+      
+      <div class="text-center mb-6">
+        <h2 class="text-sm sm:text-base font-bold text-amber-950 uppercase tracking-wide">
+          Figure 6.1: Comparison of Temperature Scales (Interactive)
+        </h2>
+        <p class="text-xs text-amber-900/80 mt-0.5">
+          <span class="inline-block bg-white/70 px-2 py-0.5 rounded-full border border-amber-300">
+            💡 Move your cursor or swipe vertically across the thermometers to compare scales &amp; observe live calculations below!
+          </span>
+        </p>
+      </div>
+
+      <!-- Main Thermometers Graphic Area -->
+      <div class="relative max-w-4xl mx-auto h-[440px] sm:h-[480px] flex justify-between items-stretch px-2 sm:px-12" id="interactive-zone">
+
+        <!-- Dynamic Horizontal Cursor Guide Line -->
+        <div id="dynamic-guide-line" class="absolute left-0 right-0 h-[2px] border-b-2 border-dashed border-red-500 pointer-events-none z-30 transition-all duration-75 flex items-center justify-end pr-2" style="top: 30%;">
+          <div class="bg-red-600 text-white text-[11px] font-mono font-bold px-2 py-0.5 rounded-l-md shadow-md flex items-center gap-1">
+            <span>Reference:</span>
+            <span id="guide-celsius-label">0.00 °C</span>
+          </div>
+        </div>
+
+        <!-- Reference Horizontal Marker Lines (Boiling, Freezing, Absolute Zero) -->
+        <!-- 1. Boiling Point Line -->
+        <div class="absolute left-0 right-0 pointer-events-none z-10 flex items-center" style="top: 18%;">
+          <div class="w-full border-b-2 border-dashed border-slate-700/60"></div>
+          <div class="whitespace-nowrap pl-2 sm:pl-3 text-[11px] sm:text-xs font-semibold text-slate-800 flex items-center gap-1">
+            <span class="text-sm">➔</span>
+            <span>Boiling point of pure water</span>
+          </div>
+        </div>
+
+        <!-- 2. Freezing Point Line -->
+        <div class="absolute left-0 right-0 pointer-events-none z-10 flex items-center" style="top: 45%;">
+          <div class="w-full border-b-2 border-dashed border-slate-700/60"></div>
+          <div class="whitespace-nowrap pl-2 sm:pl-3 text-[11px] sm:text-xs font-semibold text-slate-800 flex items-center gap-1">
+            <span class="text-sm">➔</span>
+            <span>Freezing point of pure water</span>
+          </div>
+        </div>
+
+        <!-- 3. Absolute Zero Line -->
+        <div class="absolute left-0 right-0 pointer-events-none z-10 flex items-center" style="top: 85%;">
+          <div class="w-full border-b-2 border-dashed border-slate-700/60"></div>
+          <div class="whitespace-nowrap pl-2 sm:pl-3 text-[11px] sm:text-xs font-semibold text-slate-800 flex items-center gap-1">
+            <span class="text-sm">➔</span>
+            <span class="font-bold text-red-700">Absolute zero</span>
+          </div>
+        </div>
+
+        <!-- Reference Horizontal Marker Lines (Boiling, Freezing, Absolute Zero) -->
+        <!-- 1. Boiling Point Line -->
+        <div class="absolute left-0 right-0 pointer-events-none z-10 flex items-center" style="top: 18%;">
+          <div class="w-full border-b-2 border-dashed border-slate-700/60"></div>
+          <div class="whitespace-nowrap pl-2 sm:pl-3 text-[11px] sm:text-xs font-semibold text-slate-800 flex items-center gap-1">
+            <span class="text-sm">➔</span>
+            <span>Takat didih air tulen</span>
+            <span class="hidden md:inline text-slate-500 font-normal">(Boiling point)</span>
+          </div>
+        </div>
+
+        <!-- 2. Freezing Point Line -->
+        <div class="absolute left-0 right-0 pointer-events-none z-10 flex items-center" style="top: 45%;">
+          <div class="w-full border-b-2 border-dashed border-slate-700/60"></div>
+          <div class="whitespace-nowrap pl-2 sm:pl-3 text-[11px] sm:text-xs font-semibold text-slate-800 flex items-center gap-1">
+            <span class="text-sm">➔</span>
+            <span>Takat beku air tulen</span>
+            <span class="hidden md:inline text-slate-500 font-normal">(Freezing point)</span>
+          </div>
+        </div>
+
+        <!-- 3. Absolute Zero Line -->
+        <div class="absolute left-0 right-0 pointer-events-none z-10 flex items-center" style="top: 85%;">
+          <div class="w-full border-b-2 border-dashed border-slate-700/60"></div>
+          <div class="whitespace-nowrap pl-2 sm:pl-3 text-[11px] sm:text-xs font-semibold text-slate-800 flex items-center gap-1">
+            <span class="text-sm">➔</span>
+            <span class="font-bold text-red-700">Sifar mutlak</span>
+            <span class="hidden md:inline text-slate-500 font-normal">(Absolute zero)</span>
+          </div>
+        </div>
+
+        <!-- COLUMN 1: KELVIN -->
+        <div class="flex-1 flex flex-col items-center justify-between z-20 relative">
+          <!-- Numerical scale ticks along column -->
+          <div class="relative w-full h-[360px] flex items-center justify-center">
+            
+            <!-- Value Labels on the left -->
+            <div class="absolute right-[52%] sm:right-[55%] h-full flex flex-col justify-between text-right pr-2 sm:pr-3 text-[11px] sm:text-xs font-mono font-bold text-slate-800 select-none">
+              <span style="position: absolute; top: 18%; transform: translateY(-50%); right: 8px;">373 K</span>
+              <span style="position: absolute; top: 45%; transform: translateY(-50%); right: 8px;">273 K</span>
+              <span style="position: absolute; top: 85%; transform: translateY(-50%); right: 8px;" class="text-red-700 underline font-black">0 K</span>
+            </div>
+
+            <!-- Thermometer Stem -->
+            <div class="thermometer-glass w-7 sm:w-8 h-full rounded-full relative overflow-hidden flex flex-col justify-end p-0.5">
+              <!-- Scale Ticks overlay -->
+              <div class="absolute inset-0 flex flex-col justify-between py-5 px-1 pointer-events-none opacity-40 z-10">
+                <div class="w-full border-b border-slate-900"></div>
+                <div class="w-2/3 border-b border-slate-900"></div>
+                <div class="w-full border-b border-slate-900"></div>
+                <div class="w-2/3 border-b border-slate-900"></div>
+                <div class="w-full border-b border-slate-900"></div>
+                <div class="w-2/3 border-b border-slate-900"></div>
+                <div class="w-full border-b border-slate-900"></div>
+              </div>
+
+              <!-- Inner Liquid Mercury Column -->
+              <div id="mercury-k" class="w-full bg-gradient-to-r from-red-600 via-rose-500 to-red-700 rounded-b-full transition-all duration-75 relative mercury-glow" style="height: 55%;">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-white/60 rounded-full"></div>
+              </div>
+            </div>
+
+            <!-- Current Value Badge -->
+            <div id="live-badge-k" class="absolute -top-6 bg-slate-900 text-amber-300 font-mono text-[11px] font-bold px-2 py-0.5 rounded-full shadow border border-slate-700">
+              273.15 K
+            </div>
+          </div>
+
+          <!-- Bottom Stem Base and Label Tag -->
+          <div class="flex flex-col items-center mt-2">
+            <div class="w-3.5 h-6 bg-slate-300 border border-slate-400 rounded-b-md shadow-sm"></div>
+            <div class="mt-2 bg-amber-100 border border-amber-300 shadow px-4 py-1 rounded text-xs sm:text-sm font-bold text-slate-800 tracking-wide">
+              Kelvin (K)
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMN 2: CELSIUS (REFERENCE) -->
+        <div class="flex-1 flex flex-col items-center justify-between z-20 relative">
+          
+          <div class="relative w-full h-[360px] flex items-center justify-center">
+            
+            <!-- Value Labels on the left -->
+            <div class="absolute right-[52%] sm:right-[55%] h-full flex flex-col justify-between text-right pr-2 sm:pr-3 text-[11px] sm:text-xs font-mono font-bold text-slate-800 select-none">
+              <span style="position: absolute; top: 18%; transform: translateY(-50%); right: 8px;">100°</span>
+              <span style="position: absolute; top: 45%; transform: translateY(-50%); right: 8px;">0°</span>
+              <span style="position: absolute; top: 85%; transform: translateY(-50%); right: 8px;" class="text-red-700 font-black">-273°</span>
+            </div>
+
+            <!-- Thermometer Stem -->
+            <div class="thermometer-glass w-7 sm:w-8 h-full rounded-full relative overflow-hidden flex flex-col justify-end p-0.5 ring-2 ring-emerald-500/40">
+              <!-- Scale Ticks overlay -->
+              <div class="absolute inset-0 flex flex-col justify-between py-5 px-1 pointer-events-none opacity-40 z-10">
+                <div class="w-full border-b border-slate-900"></div>
+                <div class="w-2/3 border-b border-slate-900"></div>
+                <div class="w-full border-b border-slate-900"></div>
+                <div class="w-2/3 border-b border-slate-900"></div>
+                <div class="w-full border-b border-slate-900"></div>
+                <div class="w-2/3 border-b border-slate-900"></div>
+                <div class="w-full border-b border-slate-900"></div>
+              </div>
+
+              <!-- Inner Liquid Mercury Column -->
+              <div id="mercury-c" class="w-full bg-gradient-to-r from-red-600 via-rose-500 to-red-700 rounded-b-full transition-all duration-75 relative mercury-glow" style="height: 55%;">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-white/60 rounded-full"></div>
+              </div>
+            </div>
+
+            <!-- Current Value Badge -->
+            <div id="live-badge-c" class="absolute -top-6 bg-emerald-900 text-emerald-300 font-mono text-[11px] font-bold px-2 py-0.5 rounded-full shadow border border-emerald-600 ring-2 ring-emerald-400/40">
+              0.00 °C (Reference)
+            </div>
+          </div>
+
+          <!-- Bottom Stem Base and Label Tag -->
+          <div class="flex flex-col items-center mt-2">
+            <div class="w-3.5 h-6 bg-slate-300 border border-slate-400 rounded-b-md shadow-sm"></div>
+            <div class="mt-2 bg-emerald-200 border-2 border-emerald-400 shadow px-4 py-1 rounded text-xs sm:text-sm font-extrabold text-emerald-950 tracking-wide flex items-center gap-1">
+              <span>Celsius (°C)</span>
+              <span class="text-[10px] bg-emerald-600 text-white px-1.5 py-0.2 rounded-full uppercase">Base</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMN 3: FAHRENHEIT -->
+        <div class="flex-1 flex flex-col items-center justify-between z-20 relative">
+          
+          <div class="relative w-full h-[360px] flex items-center justify-center">
+            
+            <!-- Value Labels on the left -->
+            <div class="absolute right-[52%] sm:right-[55%] h-full flex flex-col justify-between text-right pr-2 sm:pr-3 text-[11px] sm:text-xs font-mono font-bold text-slate-800 select-none">
+              <span style="position: absolute; top: 18%; transform: translateY(-50%); right: 8px;">212°</span>
+              <span style="position: absolute; top: 45%; transform: translateY(-50%); right: 8px;">32°</span>
+              <span style="position: absolute; top: 85%; transform: translateY(-50%); right: 8px;" class="text-red-700 font-black">-460°</span>
+            </div>
+
+            <!-- Thermometer Stem -->
+            <div class="thermometer-glass w-7 sm:w-8 h-full rounded-full relative overflow-hidden flex flex-col justify-end p-0.5">
+              <!-- Scale Ticks overlay -->
+              <div class="absolute inset-0 flex flex-col justify-between py-5 px-1 pointer-events-none opacity-40 z-10">
+                <div class="w-full border-b border-slate-900"></div>
+                <div class="w-2/3 border-b border-slate-900"></div>
+                <div class="w-full border-b border-slate-900"></div>
+                <div class="w-2/3 border-b border-slate-900"></div>
+                <div class="w-full border-b border-slate-900"></div>
+                <div class="w-2/3 border-b border-slate-900"></div>
+                <div class="w-full border-b border-slate-900"></div>
+              </div>
+
+              <!-- Inner Liquid Mercury Column -->
+              <div id="mercury-f" class="w-full bg-gradient-to-r from-red-600 via-rose-500 to-red-700 rounded-b-full transition-all duration-75 relative mercury-glow" style="height: 55%;">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-white/60 rounded-full"></div>
+              </div>
+            </div>
+
+            <!-- Current Value Badge -->
+            <div id="live-badge-f" class="absolute -top-6 bg-slate-900 text-amber-300 font-mono text-[11px] font-bold px-2 py-0.5 rounded-full shadow border border-slate-700">
+              32.00 °F
+            </div>
+          </div>
+
+          <!-- Bottom Stem Base and Label Tag -->
+          <div class="flex flex-col items-center mt-2">
+            <div class="w-3.5 h-6 bg-slate-300 border border-slate-400 rounded-b-md shadow-sm"></div>
+            <div class="mt-2 bg-amber-100 border border-amber-300 shadow px-4 py-1 rounded text-xs sm:text-sm font-bold text-slate-800 tracking-wide">
+              Fahrenheit (°F)
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Manual Input and Live Explanation Bar -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      
+      <!-- Controller Box -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+              Fine Temperature Adjuster (°C)
+            </h3>
+            <span class="text-xs bg-slate-100 px-2 py-0.5 rounded font-mono text-slate-600">Manual</span>
+          </div>
+
+          <!-- Slider Range: -273.15 to 150 -->
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span>Celsius Value (Reference):</span>
+                <span id="slider-readout" class="font-mono text-emerald-700 font-bold">0.0 °C</span>
+              </div>
+              <input type="range" id="celsius-slider" min="-273.15" max="150" step="0.5" value="0" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+              <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1">
+                <span>-273.15°C (Abs. Zero)</span>
+                <span>0°C</span>
+                <span>100°C</span>
+                <span>150°C</span>
+              </div>
+            </div>
+
+            <!-- Direct Numeric Input Box -->
+            <div class="pt-2 flex items-center gap-2">
+              <label for="celsius-number" class="text-xs text-slate-600 whitespace-nowrap">Enter Value (°C):</label>
+              <div class="relative flex-1">
+                <input type="number" id="celsius-number" value="0" step="any" min="-273.15" class="w-full text-sm font-mono px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                <span class="absolute right-3 top-2 text-xs font-bold text-slate-400">°C</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-[11px] text-slate-400 mt-4">
+          Tip: Move your mouse or drag across the thermometer board above for quick dynamic adjustments!
+        </p>
+      </div>
+
+      <!-- Permanent Step-by-Step Display Panel -->
+      <div class="md:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-100">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+              Step-by-Step Conversion Based on Celsius (<span id="panel-c-title" class="text-emerald-700">0.00 °C</span>)
+            </h3>
+            <span class="text-xs bg-emerald-50 text-emerald-700 font-medium px-2 py-0.5 rounded border border-emerald-200">
+              Reference Axis: T<sub>C</sub>
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Step Kelvin -->
+            <div class="bg-amber-50/50 p-3.5 rounded-xl border border-amber-200 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="font-bold text-amber-900 text-xs">A. Kelvin Scale Conversion</span>
+                  <span class="text-[10px] font-mono bg-amber-200/80 text-amber-900 px-1.5 py-0.5 rounded font-bold">K</span>
+                </div>
+                <div class="font-mono text-xs text-slate-700 space-y-1.5 bg-white p-2.5 rounded-lg border border-amber-100 shadow-sm">
+                  <div class="text-slate-400 text-[11px]">K = °C + 273.15</div>
+                  <div>K = (<span class="font-bold text-emerald-700" id="panel-k-c-sub">0.00</span>) + 273.15</div>
+                  <div class="pt-1 border-t border-slate-100 text-amber-900 font-extrabold text-sm">
+                    = <span id="panel-k-result">273.15</span> K
+                  </div>
+                </div>
+              </div>
+              <p class="text-[10px] text-amber-800/80 mt-2">
+                *The Kelvin scale is an absolute thermodynamic temperature scale with no degree symbol (°).
+              </p>
+            </div>
+
+            <!-- Step Fahrenheit -->
+            <div class="bg-blue-50/50 p-3.5 rounded-xl border border-blue-200 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="font-bold text-blue-900 text-xs">B. Fahrenheit Scale Conversion</span>
+                  <span class="text-[10px] font-mono bg-blue-200/80 text-blue-900 px-1.5 py-0.5 rounded font-bold">°F</span>
+                </div>
+                <div class="font-mono text-xs text-slate-700 space-y-1.5 bg-white p-2.5 rounded-lg border border-blue-100 shadow-sm">
+                  <div class="text-slate-400 text-[11px]">°F = (9/5 × °C) + 32</div>
+                  <div>°F = ( 1.8 × <span class="font-bold text-emerald-700" id="panel-f-c-sub">0.00</span> ) + 32</div>
+                  <div>°F = <span id="panel-f-mult">0.00</span> + 32</div>
+                  <div class="pt-1 border-t border-slate-100 text-blue-900 font-extrabold text-sm">
+                    = <span id="panel-f-result">32.00</span> °F
+                  </div>
+                </div>
+              </div>
+              <p class="text-[10px] text-blue-800/80 mt-2">
+                *The factor 9/5 (or 1.8) accounts for the 180° interval between freezing and boiling on the Fahrenheit scale versus 100° on Celsius.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Direct equivalence summary bar -->
+        <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-around gap-2 text-center text-xs">
+          <div class="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+            <span class="text-slate-400">Celsius:</span> 
+            <span class="font-mono font-bold text-emerald-700" id="summary-c">0.00 °C</span>
+          </div>
+          <span class="text-slate-300 font-black">≡</span>
+          <div class="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+            <span class="text-slate-400">Kelvin:</span> 
+            <span class="font-mono font-bold text-amber-700" id="summary-k">273.15 K</span>
+          </div>
+          <span class="text-slate-300 font-black">≡</span>
+          <div class="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+            <span class="text-slate-400">Fahrenheit:</span> 
+            <span class="font-mono font-bold text-blue-700" id="summary-f">32.00 °F</span>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Security & Copyright Toast Notification -->
+  <div id="security-toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-base">
+        🔒
+      </div>
+      <div>
+        <p class="text-xs font-bold text-slate-100">Protected Simulation Content</p>
+        <p class="text-[11px] text-slate-400">&copy; 2026 Politeknik Port Dickson &bull; Mohd Saiful Pahrudin</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formula Reference Modal (Figure 6.2 Formula Cycle) -->
+  <div id="formula-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+    <div class="bg-amber-50 rounded-3xl max-w-lg w-full p-6 shadow-2xl border-4 border-amber-300 transform scale-95 transition-transform duration-200" id="modal-box">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-amber-200 mb-4">
+        <h3 class="font-extrabold text-amber-950 text-base flex items-center gap-2">
+          <span>🔄</span> Temperature Scale Conversion Formulas (Figure 2)
+        </h3>
+        <button id="btn-close-modal" class="w-8 h-8 rounded-full bg-amber-200/80 hover:bg-amber-300 text-amber-900 flex items-center justify-center font-bold text-sm">
+          ✕
+        </button>
+      </div>
+
+      <!-- Diagrammatic Layout inspired by Figure 2 -->
+      <div class="relative bg-amber-100/60 rounded-2xl p-4 border border-amber-300 text-slate-800">
+        
+        <!-- Center Triangular Relationship -->
+        <div class="flex justify-around items-center my-4 font-mono font-black text-2xl text-red-600">
+          <div class="bg-white px-4 py-2 rounded-xl shadow border border-amber-300">K</div>
+          <span class="text-amber-500 text-xl">⇄</span>
+          <div class="bg-white px-4 py-2 rounded-xl shadow border border-amber-300">°C</div>
+          <span class="text-amber-500 text-xl">⇄</span>
+          <div class="bg-white px-4 py-2 rounded-xl shadow border border-amber-300">°F</div>
+        </div>
+
+        <!-- Formulas List matching exactly provided sheet -->
+        <div class="space-y-2.5 text-xs font-mono bg-white/90 p-3.5 rounded-xl border border-amber-200">
+          <div class="p-1.5 rounded hover:bg-amber-50">
+            <span class="text-emerald-700 font-bold">Celsius ⇄ Kelvin:</span>
+            <div class="pl-2 mt-0.5 text-slate-700 font-semibold space-y-0.5">
+              <p>• K = °C + 273.15</p>
+              <p>• °C = K - 273.15</p>
+            </div>
+          </div>
+
+          <div class="p-1.5 rounded hover:bg-amber-50 border-t border-amber-100">
+            <span class="text-blue-700 font-bold">Celsius ⇄ Fahrenheit:</span>
+            <div class="pl-2 mt-0.5 text-slate-700 font-semibold space-y-0.5">
+              <p>• °F = (9/5 × °C) + 32</p>
+              <p>• °C = 5/9 × (°F - 32)</p>
+            </div>
+          </div>
+
+          <div class="p-1.5 rounded hover:bg-amber-50 border-t border-amber-100">
+            <span class="text-purple-700 font-bold">Kelvin ⇄ Fahrenheit:</span>
+            <div class="pl-2 mt-0.5 text-slate-700 font-semibold space-y-0.5">
+              <p>• K = [5/9 × (°F - 32)] + 273.15</p>
+              <p>• °F = [9/5 × (K - 273.15)] + 32</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-4 flex justify-end">
+        <button id="btn-close-modal-2" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-md transition">
+          Got it &amp; Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom Attribution Footer -->
+  <footer class="bg-white border-t border-slate-200 py-3.5 text-center">
+    <div class="text-xs sm:text-sm font-extrabold tracking-wider text-slate-800 uppercase">
+      MOHDSAIFULPAHRUDIN
+    </div>
+    <div class="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">
+      &copy; 2026 Politeknik Port Dickson &bull; All Rights Reserved
+    </div>
+  </footer>
+
+  <script>
+    // State management
+    // We calibrate the visual height of the thermometers matching Figure 6.1:
+    // Top line (18% from top stem) = 100°C (373 K, 212°F)
+    // Middle line (45% from top stem) = 0°C (273 K, 32°F)
+    // Bottom line (85% from top stem) = -273.15°C (0 K, -459.67°F)
+
+    let currentCelsius = 0.0;
+    const minCelsius = -273.15;
+    const maxCelsius = 150.0;
+
+    // DOM Elements
+    const mercuryK = document.getElementById('mercury-k');
+    const mercuryC = document.getElementById('mercury-c');
+    const mercuryF = document.getElementById('mercury-f');
+
+    const badgeK = document.getElementById('live-badge-k');
+    const badgeC = document.getElementById('live-badge-c');
+    const badgeF = document.getElementById('live-badge-f');
+
+    const guideLine = document.getElementById('dynamic-guide-line');
+    const guideCelsiusLabel = document.getElementById('guide-celsius-label');
+
+    const slider = document.getElementById('celsius-slider');
+    const numInput = document.getElementById('celsius-number');
+    const sliderReadout = document.getElementById('slider-readout');
+
+    // Panel Elements
+    const panelCTitle = document.getElementById('panel-c-title');
+    const panelKCSub = document.getElementById('panel-k-c-sub');
+    const panelKResult = document.getElementById('panel-k-result');
+
+    const panelFCSub = document.getElementById('panel-f-c-sub');
+    const panelFMult = document.getElementById('panel-f-mult');
+    const panelFResult = document.getElementById('panel-f-result');
+
+    const summaryC = document.getElementById('summary-c');
+    const summaryK = document.getElementById('summary-k');
+    const summaryF = document.getElementById('summary-f');
+
+    const board = document.getElementById('simulator-board');
+    const interactiveZone = document.getElementById('interactive-zone');
+
+    // Conversion functions strictly adhering to image formula
+    function celsiusToKelvin(c) {
+      return c + 273.15;
+    }
+
+    function celsiusToFahrenheit(c) {
+      return (c * 9 / 5) + 32;
+    }
+
+    function formatNumber(num, decimals = 2) {
+      // Remove unnecessary trailing zeroes if integer
+      const fixed = num.toFixed(decimals);
+      return parseFloat(fixed).toString() === fixed ? fixed : parseFloat(fixed).toString();
+    }
+
+    // Map temperature in Celsius to vertical visual position percentage (0% top, 100% bottom)
+    // Between 0°C and 100°C: 45% -> 18% (delta = -27% for +100°C => 0.27% per °C)
+    // Between -273.15°C and 0°C: 85% -> 45% (delta = -40% for +273.15°C => 0.14644% per °C)
+    function celsiusToPositionPercent(c) {
+      if (c >= 0) {
+        // 0°C at 45%, 100°C at 18%, 150°C at 4.5%
+        const pct = 45 - (c * 0.27);
+        return Math.max(2, Math.min(95, pct));
+      } else {
+        // 0°C at 45%, -273.15°C at 85%
+        const fraction = Math.abs(c) / 273.15;
+        const pct = 45 + (fraction * 40);
+        return Math.max(2, Math.min(95, pct));
+      }
+    }
+
+    // Inverse: Given a vertical percentage (0% top to 100% bottom), calculate Celsius
+    function positionPercentToCelsius(pct) {
+      if (pct <= 45) {
+        // above 0°C
+        const diff = 45 - pct;
+        return diff / 0.27;
+      } else {
+        // below 0°C
+        const diff = pct - 45;
+        const fraction = diff / 40;
+        return -(fraction * 273.15);
+      }
+    }
+
+    function updateAll(celsiusVal, updateInputControls = true) {
+      // Clamp within physical minimum
+      if (celsiusVal < minCelsius) celsiusVal = minCelsius;
+      currentCelsius = celsiusVal;
+
+      const kVal = celsiusToKelvin(celsiusVal);
+      const fVal = celsiusToFahrenheit(celsiusVal);
+
+      // 1. Calculate visual positions
+      const topPercent = celsiusToPositionPercent(celsiusVal);
+      const mercuryHeightPercent = Math.max(0, Math.min(100, 100 - topPercent));
+
+      // Update stems
+      mercuryK.style.height = `${mercuryHeightPercent}%`;
+      mercuryC.style.height = `${mercuryHeightPercent}%`;
+      mercuryF.style.height = `${mercuryHeightPercent}%`;
+
+      // Update top badges
+      badgeK.textContent = `${formatNumber(kVal, 2)} K`;
+      badgeC.textContent = `${formatNumber(celsiusVal, 2)} °C`;
+      badgeF.textContent = `${formatNumber(fVal, 2)} °F`;
+
+      // Dynamic guide line position
+      guideLine.style.top = `${topPercent}%`;
+      guideCelsiusLabel.textContent = `${formatNumber(celsiusVal, 2)} °C`;
+
+      // Update Form Controls if prompted
+      if (updateInputControls) {
+        slider.value = celsiusVal;
+        sliderReadout.textContent = `${formatNumber(celsiusVal, 1)} °C`;
+        numInput.value = Number(celsiusVal.toFixed(2));
+      }
+
+      const fMultValue = (1.8 * celsiusVal);
+
+      // Update Stationary Panel
+      panelCTitle.textContent = `${formatNumber(celsiusVal, 2)} °C`;
+      panelKCSub.textContent = formatNumber(celsiusVal, 2);
+      panelKResult.textContent = formatNumber(kVal, 2);
+
+      panelFCSub.textContent = formatNumber(celsiusVal, 2);
+      panelFMult.textContent = formatNumber(fMultValue, 2);
+      panelFResult.textContent = formatNumber(fVal, 2);
+
+      summaryC.textContent = `${formatNumber(celsiusVal, 2)} °C`;
+      summaryK.textContent = `${formatNumber(kVal, 2)} K`;
+      summaryF.textContent = `${formatNumber(fVal, 2)} °F`;
+    }
+
+    // Set preset button helper
+    window.setCelsius = function(val) {
+      updateAll(val, true);
+    };
+
+    function handlePointerMove(e) {
+      const zoneRect = interactiveZone.getBoundingClientRect();
+
+      // Check vertical position relative to interactive zone
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      // Vertical offset within zone
+      let relativeY = clientY - zoneRect.top;
+      let pct = (relativeY / zoneRect.height) * 100;
+      pct = Math.max(5, Math.min(92, pct));
+
+      // Calculate corresponding Celsius value
+      const targetC = positionPercentToCelsius(pct);
+      updateAll(targetC, true);
+    }
+
+    // Interactive Zone Event Listeners
+    interactiveZone.addEventListener('mousemove', handlePointerMove);
+    interactiveZone.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      handlePointerMove(e);
+    }, { passive: false });
+
+    // Touch events support
+    interactiveZone.addEventListener('touchstart', (e) => {
+      handlePointerMove(e);
+    }, { passive: false });
+
+    slider.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      updateAll(val, false);
+      sliderReadout.textContent = `${formatNumber(val, 1)} °C`;
+      numInput.value = Number(val.toFixed(2));
+    });
+
+    numInput.addEventListener('input', (e) => {
+      let val = parseFloat(e.target.value);
+      if (isNaN(val)) return;
+      if (val < minCelsius) val = minCelsius;
+      updateAll(val, false);
+      slider.value = val;
+      sliderReadout.textContent = `${formatNumber(val, 1)} °C`;
+    });
+
+    const formulaModal = document.getElementById('formula-modal');
+    const modalBox = document.getElementById('modal-box');
+    const btnToggleFormula = document.getElementById('btn-toggle-formula');
+    const btnCloseModal = document.getElementById('btn-close-modal');
+    const btnCloseModal2 = document.getElementById('btn-close-modal-2');
+
+    function openModal() {
+      formulaModal.classList.remove('hidden');
+      setTimeout(() => {
+        formulaModal.classList.remove('opacity-0');
+        modalBox.classList.remove('scale-95');
+        modalBox.classList.add('scale-100');
+      }, 10);
+    }
+
+    function closeModal() {
+      formulaModal.classList.add('opacity-0');
+      modalBox.classList.remove('scale-100');
+      modalBox.classList.add('scale-95');
+      setTimeout(() => {
+        formulaModal.classList.add('hidden');
+      }, 200);
+    }
+
+    btnToggleFormula.addEventListener('click', openModal);
+    btnCloseModal.addEventListener('click', closeModal);
+    btnCloseModal2.addEventListener('click', closeModal);
+    formulaModal.addEventListener('click', (e) => {
+      if (e.target === formulaModal) closeModal();
+    });
+
+    // Security & Anti-Inspection Deterrents
+    const securityToast = document.getElementById('security-toast');
+    let toastTimeout = null;
+
+    function triggerSecurityNotice() {
+      if (toastTimeout) clearTimeout(toastTimeout);
+      securityToast.classList.remove('translate-y-20', 'opacity-0');
+      securityToast.classList.add('translate-y-0', 'opacity-100');
+      toastTimeout = setTimeout(() => {
+        securityToast.classList.add('translate-y-20', 'opacity-0');
+        securityToast.classList.remove('translate-y-0', 'opacity-100');
+      }, 2500);
+    }
+
+    // 1. Disable Right-Click Context Menu
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      triggerSecurityNotice();
+    });
+
+    // 2. Prevent Source Code Viewing & Developer Tool Shortcuts
+    document.addEventListener('keydown', (e) => {
+      // F12 key
+      if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault();
+        triggerSecurityNotice();
+        return false;
+      }
+      // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (Inspect elements)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c'].includes(e.key)) {
+        e.preventDefault();
+        triggerSecurityNotice();
+        return false;
+      }
+      // Ctrl+U (View Page Source) or Ctrl+S (Save Webpage)
+      if ((e.ctrlKey || e.metaKey) && ['U', 'u', 'S', 's'].includes(e.key)) {
+        e.preventDefault();
+        triggerSecurityNotice();
+        return false;
+      }
+    });
+
+    // 3. Disable Drag-and-drop of assets and text
+    document.addEventListener('dragstart', (e) => {
+      e.preventDefault();
+    });
+
+    // 4. Console Protection and Attribution Warning
+    console.clear();
+    console.log(
+      '%c⚠️ RESTRICTED CONTENT & COPYRIGHT NOTICE%c\n\nInteractive Temperature Scale Simulator\nAuthor: MOHDSAIFULPAHRUDIN\n© 2026 Politeknik Port Dickson. All rights reserved.\nUnauthorized reproduction, reverse-engineering, or duplication of this simulation code is strictly prohibited.',
+      'color: #059669; font-size: 16px; font-weight: bold; background: #ecfdf5; padding: 4px 8px; border-radius: 6px;',
+      'color: #475569; font-size: 12px; line-height: 1.5;'
+    );
+
+    window.onload = function() {
+      // Initialise at 0°C (Freezing point of pure water)
+      updateAll(0.0, true);
+    };
+  </script>
+</body>
+</html>
