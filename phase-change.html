@@ -55,16 +55,25 @@
         </div>
       </div>
 
-      <!-- Mode Selector Tabs (Ascending vs Descending Curves) -->
-      <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
-        <button id="btnTabHeating" onclick="setMode('heating')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-xs bg-white text-rose-600">
-          <i class="fa-solid fa-arrow-trend-up"></i>
-          <span>Heating Curve (Ascending)</span>
-        </button>
-        <button id="btnTabCooling" onclick="setMode('cooling')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900">
-          <i class="fa-solid fa-arrow-trend-down"></i>
-          <span>Cooling Curve (Descending)</span>
-        </button>
+      <!-- Action Area: Home Button & Mode Selector Tabs -->
+      <div class="flex items-center flex-wrap gap-2.5">
+        <!-- Home Button -->
+        <a href="index.html" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 hover:text-indigo-600 shadow-xs">
+          <i class="fa-solid fa-house text-slate-500"></i>
+          <span>Home</span>
+        </a>
+
+        <!-- Mode Selector Tabs (Ascending vs Descending Curves) -->
+        <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+          <button id="btnTabHeating" onclick="setMode('heating')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-xs bg-white text-rose-600">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+            <span>Heating Curve (Ascending)</span>
+          </button>
+          <button id="btnTabCooling" onclick="setMode('cooling')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900">
+            <i class="fa-solid fa-arrow-trend-down"></i>
+            <span>Cooling Curve (Descending)</span>
+          </button>
+        </div>
       </div>
     </div>
   </header>
