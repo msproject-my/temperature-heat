@@ -273,7 +273,15 @@
           <i id="btnSpinner" class="fa-solid fa-circle-notch fa-spin hidden"></i>
         </button>
 
-      
+        <!-- Live Diagnostics Link -->
+        <div class="text-center pt-2">
+          <button 
+            type="button" 
+            onclick="testGSheetConnection()" 
+            class="text-[11px] text-slate-500 hover:text-sky-600 underline font-medium">
+            <i class="fa-solid fa-wrench mr-1"></i> Test GSheet Sync Connection
+          </button>
+        </div>
 
       </form>
     </div>
@@ -323,7 +331,18 @@
           </ul>
         </div>
 
-        
+        <!-- Security & Copyright Notice -->
+        <div>
+          <h4 class="text-white text-xs font-bold uppercase tracking-wider mb-3">System Security</h4>
+          <p class="text-xs text-slate-400 leading-relaxed mb-3">
+            Content, source code, and simulation models are protected under Educational Copyright.
+          </p>
+          <div class="inline-flex items-center gap-1 text-[11px] text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded border border-slate-700">
+            <i class="fa-solid fa-shield-halved text-sky-400"></i> Anti-Tamper Protected
+          </div>
+        </div>
+
+      </div>
 
       <!-- Copyright Bar -->
       <div class="border-t border-slate-800/80 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
