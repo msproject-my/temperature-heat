@@ -1,6 +1,5 @@
-```html
 <!DOCTYPE html>
-<html lang="ms" class="h-full w-full bg-slate-50">
+<html lang="ms" class="h-full w-full bg-slate-900">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +9,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts Inter -->
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -29,7 +28,7 @@
   </script>
 
   <style>
-    /* Sekatan Keselamatan: Tiada pemilihan teks & tiada seretan imej */
+    /* Halang pemilihan teks dan seretan */
     * {
       -webkit-user-select: none !important;
       -moz-user-select: none !important;
@@ -38,11 +37,11 @@
       -webkit-touch-callout: none !important;
     }
 
-    /* Corak latar belakang cerah, bersih dan moden */
-    .bg-light-canvas {
-      background-color: #f8fafc;
-      background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px);
-      background-size: 24px 24px;
+    /* Corak latar belakang moden & gelap */
+    .bg-dark-grid {
+      background-color: #0f172a;
+      background-image: radial-gradient(rgba(99, 102, 241, 0.15) 1.2px, transparent 1.2px);
+      background-size: 28px 28px;
     }
 
     /* Animasi toast amaran */
@@ -56,7 +55,7 @@
   </style>
 </head>
 
-<body class="h-full w-full flex flex-col justify-between bg-light-canvas text-slate-800 relative overflow-hidden select-none">
+<body class="h-full w-full flex flex-col justify-between bg-dark-grid text-slate-100 relative overflow-hidden select-none">
 
   <!-- Toast Notifikasi Perlindungan Hak Cipta -->
   <div id="securityToast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 hidden max-w-sm w-[90%] bg-slate-900/95 border border-rose-500/60 backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 text-xs transition-all pointer-events-none">
@@ -69,245 +68,79 @@
     </div>
   </div>
 
-  <!-- Bahagian Atas: Butang Home Sahaja -->
-  <header class="w-full px-5 py-4 flex items-center justify-between z-30 shrink-0">
+  <!-- Bahagian Atas: Butang Navigasi Home & Tajuk Ringkas -->
+  <header class="w-full px-5 py-4 flex items-center justify-between z-30 shrink-0 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md">
     <!-- Butang Home ke index.html -->
     <a href="index.html" 
-       class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 hover:text-indigo-600 font-semibold text-xs border border-slate-200/90 shadow-sm hover:shadow transition-all duration-200 active:scale-95">
-      <i class="fa-solid fa-house text-indigo-600"></i>
+       class="inline-flex items-center space-x-2.5 px-4 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 hover:text-white font-medium text-xs sm:text-sm border border-slate-700/80 shadow-md hover:shadow-indigo-500/10 transition-all duration-200 active:scale-95">
+      <i class="fa-solid fa-house text-indigo-400"></i>
       <span>Home</span>
     </a>
+
+    <!-- Tajuk Tengah / Sub-info -->
+    <div class="flex items-center space-x-2">
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+        <i class="fa-solid fa-fire mr-1.5 text-amber-400"></i> Heat Transfer Process
+      </span>
+    </div>
+
+    <!-- Butang Paparan Skrin Penuh -->
+    <button id="fullscreenToggleBtn" 
+            title="Skrin Penuh"
+            class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 transition-all active:scale-95">
+      <i id="fullscreenIcon" class="fa-solid fa-expand text-xs"></i>
+    </button>
   </header>
 
-  <!-- Bahagian Tengah: Video Berpusat & Autoplay (Fit 16:9 Tanpa Terpotong) -->
+  <!-- Bahagian Utama: Video Google Drive Terbenam (Responsif 16:9) -->
   <main class="flex-1 w-full flex items-center justify-center p-3 sm:p-6 overflow-hidden">
-    <div id="videoContainer" class="relative w-full max-w-5xl aspect-video max-h-[calc(100vh-6rem)] rounded-2xl overflow-hidden bg-slate-950 shadow-2xl shadow-slate-300/60 border border-slate-200 ring-1 ring-black/5 flex items-center justify-center">
+    <div id="videoContainer" class="relative w-full max-w-5xl aspect-video max-h-[calc(100vh-7.5rem)] rounded-2xl overflow-hidden bg-black shadow-2xl shadow-indigo-950/40 border border-slate-800 ring-1 ring-white/10 flex items-center justify-center">
       
-      <!-- Pemain Video HTML5 Autoplay Loop (Seperti Fail GIF) -->
-      <video 
-        id="gifVideo" 
-        class="w-full h-full object-contain hidden"
-        autoplay 
-        loop 
-        muted 
-        playsinline
-        preload="auto">
-        <source src="heat_transfer.mp4" type="video/mp4">
-        <source src="temperature_heat.mp4" type="video/mp4">
-        <source src="video.mp4" type="video/mp4">
-      </video>
-
-      <!-- Iframe Google Drive Sekiranya Digunakan -->
+      <!-- Video Google Drive Menggunakan Pautan /preview untuk Embed Terus -->
       <iframe 
-        id="driveIframe" 
-        src="" 
-        class="w-full h-full border-0 absolute inset-0 hidden"
-        allow="autoplay; fullscreen" 
+        id="driveVideoPlayer"
+        src="https://drive.google.com/file/d/1rs-v31-496Rv2lmSQPkjH-NfabE2P1Mi/preview" 
+        class="w-full h-full border-0 absolute inset-0"
+        allow="autoplay; fullscreen"
         allowfullscreen>
       </iframe>
-
-      <!-- Kotak Permulaan (Hanya Muncul Jika Fail Belum Disimpan Untuk Autoplay Serta-Merta) -->
-      <div id="setupOverlay" class="absolute inset-0 z-20 bg-slate-900/90 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center text-white transition-opacity duration-300">
-        <div class="w-16 h-16 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center mb-4 text-indigo-400 text-2xl shadow-inner animate-pulse">
-          <i class="fa-solid fa-film"></i>
-        </div>
-        <h3 class="text-lg sm:text-xl font-bold font-heading mb-1 text-white">Mulakan Video Heat Transfer</h3>
-        <p class="text-xs sm:text-sm text-slate-300 max-w-md mb-5 leading-relaxed">
-          Pilih atau seret fail video MP4 anda ke sini. Sistem akan menyimpannya secara automatik supaya ia <span class="text-indigo-300 font-semibold">terus berputar (autoplay loop macam GIF)</span> setiap kali anda membuka halaman ini!
-        </p>
-
-        <div class="flex flex-wrap gap-3 justify-center items-center">
-          <label class="cursor-pointer inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-indigo-600/30 transition-all transform active:scale-95">
-            <i class="fa-solid fa-folder-open"></i>
-            <span>Pilih Fail Video Anda</span>
-            <input type="file" id="videoFileInput" accept="video/mp4,video/*" class="hidden">
-          </label>
-
-          <button id="useDriveBtn" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs sm:text-sm border border-slate-700 transition-all">
-            <i class="fa-brands fa-google-drive text-amber-400"></i>
-            <span>Mainkan Melalui Google Drive</span>
-          </button>
-        </div>
-      </div>
 
     </div>
   </main>
 
+  <!-- Bahagian Bawah: Hak Cipta & Maklumat Footer -->
+  <footer class="w-full py-2.5 px-4 text-center text-[11px] text-slate-500 border-t border-slate-800/60 bg-slate-900/40">
+    <p>Hak Cipta Terpelihara &copy; MOHDSAIFULPAHRUDIN</p>
+  </footer>
+
   <script>
-    const gifVideo = document.getElementById('gifVideo');
-    const driveIframe = document.getElementById('driveIframe');
-    const setupOverlay = document.getElementById('setupOverlay');
-    const videoContainer = document.getElementById('videoContainer');
-    const videoFileInput = document.getElementById('videoFileInput');
-    const useDriveBtn = document.getElementById('useDriveBtn');
-    const toggleAudioBtn = document.getElementById('toggleAudioBtn');
-    const audioIcon = document.getElementById('audioIcon');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    // Logik Skrin Penuh (Fullscreen)
+    const fullscreenToggleBtn = document.getElementById('fullscreenToggleBtn');
+    const fullscreenIcon = document.getElementById('fullscreenIcon');
 
-    // Inisialisasi Pangkalan Data IndexedDB untuk menyimpan video secara kekal di browser
-    const DB_NAME = 'SaifulHeatTransferDB';
-    const DB_STORE = 'videoStore';
-    const DB_KEY = 'heat_transfer_video_blob';
-
-    function openDatabase() {
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, 1);
-        request.onupgradeneeded = (e) => {
-          const db = e.target.result;
-          if (!db.objectStoreNames.contains(DB_STORE)) {
-            db.createObjectStore(DB_STORE);
-          }
-        };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    async function saveVideoToDB(blob) {
-      try {
-        const db = await openDatabase();
-        const tx = db.transaction(DB_STORE, 'readwrite');
-        tx.objectStore(DB_STORE).put(blob, DB_KEY);
-      } catch (err) {
-        console.warn('Gagal menyimpan video ke storan tempatan:', err);
-      }
-    }
-
-    async function getVideoFromDB() {
-      try {
-        const db = await openDatabase();
-        return new Promise((resolve) => {
-          const tx = db.transaction(DB_STORE, 'readonly');
-          const req = tx.objectStore(DB_STORE).get(DB_KEY);
-          req.onsuccess = () => resolve(req.result);
-          req.onerror = () => resolve(null);
-        });
-      } catch {
-        return null;
-      }
-    }
-
-    // Fungsi memulakan mainan video secara looping macam GIF
-    function startVideoPlayback(url) {
-      driveIframe.classList.add('hidden');
-      driveIframe.src = "";
-      
-      gifVideo.src = url;
-      gifVideo.classList.remove('hidden');
-      setupOverlay.classList.add('hidden');
-
-      gifVideo.muted = true;
-      gifVideo.currentTime = 0;
-      
-      const playPromise = gifVideo.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          gifVideo.muted = true;
-          gifVideo.play();
-        });
-      }
-    }
-
-    // Semak video sedia ada pada permulaan halaman
-    window.addEventListener('DOMContentLoaded', async () => {
-      // 1. Semak sama ada video telah disimpan dalam IndexedDB sebelum ini
-      const savedBlob = await getVideoFromDB();
-      if (savedBlob) {
-        const blobUrl = URL.createObjectURL(savedBlob);
-        startVideoPlayback(blobUrl);
-        return;
-      }
-
-      // 2. Sekiranya tiada dalam DB, cuba muat fail setempat 'heat_transfer.mp4'
-      gifVideo.classList.remove('hidden');
-      gifVideo.muted = true;
-      const initialPlay = gifVideo.play();
-      if (initialPlay !== undefined) {
-        initialPlay.then(() => {
-          // Berjaya main fail tempatan
-          setupOverlay.classList.add('hidden');
-        }).catch(() => {
-          // Gagal, paparkan overlay untuk pengguna seret/pilih fail video sekali sahaja
-          gifVideo.classList.add('hidden');
-          setupOverlay.classList.remove('hidden');
-        });
-      }
-    });
-
-    // Tangani pemilihan fail video melalui input
-    videoFileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        saveVideoToDB(file);
-        const fileUrl = URL.createObjectURL(file);
-        startVideoPlayback(fileUrl);
-      }
-    });
-
-    // Tangani Drag & Drop fail video terus ke atas kontena video
-    videoContainer.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      videoContainer.classList.add('ring-4', 'ring-indigo-500');
-    });
-
-    videoContainer.addEventListener('dragleave', (e) => {
-      e.preventDefault();
-      videoContainer.classList.remove('ring-4', 'ring-indigo-500');
-    });
-
-    videoContainer.addEventListener('drop', (e) => {
-      e.preventDefault();
-      videoContainer.classList.remove('ring-4', 'ring-indigo-500');
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        const file = e.dataTransfer.files[0];
-        if (file.type.startsWith('video/')) {
-          saveVideoToDB(file);
-          const fileUrl = URL.createObjectURL(file);
-          startVideoPlayback(fileUrl);
-        }
-      }
-    });
-
-    // Pilihan sandaran ke Google Drive
-    useDriveBtn.addEventListener('click', () => {
-      gifVideo.pause();
-      gifVideo.classList.add('hidden');
-      setupOverlay.classList.add('hidden');
-      
-      driveIframe.src = "https://drive.google.com/file/d/1rs-v31-496Rv2lmSQPkjH-NfabE2P1Mi/preview";
-      driveIframe.classList.remove('hidden');
-    });
-
-    // Butang Audio
-    toggleAudioBtn.addEventListener('click', () => {
-      if (!gifVideo.classList.contains('hidden')) {
-        gifVideo.muted = !gifVideo.muted;
-        if (gifVideo.muted) {
-          audioIcon.className = "fa-solid fa-volume-xmark";
-        } else {
-          audioIcon.className = "fa-solid fa-volume-high text-indigo-600";
-        }
-      }
-    });
-
-    // Butang Skrin Penuh
-    fullscreenBtn.addEventListener('click', () => {
+    fullscreenToggleBtn.addEventListener('click', () => {
       if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
+        document.documentElement.requestFullscreen().then(() => {
+          fullscreenIcon.className = "fa-solid fa-compress text-xs";
+        }).catch(() => {});
       } else {
         if (document.exitFullscreen) {
-          document.exitFullscreen();
+          document.exitFullscreen().then(() => {
+            fullscreenIcon.className = "fa-solid fa-expand text-xs";
+          }).catch(() => {});
         }
       }
     });
 
-    // Pastikan video mengulang (loop) dengan lancar
-    gifVideo.addEventListener('ended', function() {
-      gifVideo.currentTime = 0;
-      gifVideo.play();
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) {
+        fullscreenIcon.className = "fa-solid fa-expand text-xs";
+      } else {
+        fullscreenIcon.className = "fa-solid fa-compress text-xs";
+      }
     });
 
-    // Paparan amaran keselamatan
+    // Paparan Notifikasi Amaran Keselamatan (Toast)
     let toastTimer;
     function showSecurityToast() {
       const toast = document.getElementById('securityToast');
@@ -318,27 +151,25 @@
       toastTimer = setTimeout(() => {
         toast.classList.add('hidden');
         toast.classList.remove('animate-toast');
-      }, 3000);
+      }, 2500);
     }
 
-    // 1. Sekat Klik Kanan (Anti-Right Click)
+    // 1. Menghalang Klik Kanan (Anti-Right Click)
     document.addEventListener('contextmenu', function(e) {
       e.preventDefault();
       showSecurityToast();
       return false;
     });
 
-    // 2. Sekat Operasi Seretan Kandungan Luar
+    // 2. Menghalang Tindakan Seret (Drag)
     document.addEventListener('dragstart', function(e) {
-      if (e.target.tagName === 'VIDEO' || e.target.tagName === 'IMG') {
-        e.preventDefault();
-        return false;
-      }
+      e.preventDefault();
+      return false;
     });
 
-    // 3. Sekat Pintasan Kekunci (F12, Inspect, View Source, Save, Copy, Print)
+    // 3. Menghalang Pintasan Kekunci DevTools & Simpanan Fail
     document.addEventListener('keydown', function(e) {
-      // F12 DevTools
+      // F12 (DevTools)
       if (e.keyCode === 123) {
         e.preventDefault();
         showSecurityToast();
@@ -350,39 +181,13 @@
         showSecurityToast();
         return false;
       }
-      // Ctrl+U (View Source), Ctrl+S (Save), Ctrl+P (Print), Ctrl+C (Copy)
-      if ((e.ctrlKey || e.metaKey) && ['u','U','s','S','p','P','c','C'].includes(e.key)) {
+      // Ctrl+U (View Source), Ctrl+S (Save), Ctrl+P (Print)
+      if ((e.ctrlKey || e.metaKey) && ['u','U','s','S','p','P'].includes(e.key)) {
         e.preventDefault();
         showSecurityToast();
         return false;
       }
     });
-
-    // 4. Sekat Event Salin Teks
-    document.addEventListener('copy', function(e) {
-      e.preventDefault();
-      showSecurityToast();
-      return false;
-    });
-
-    // Watermark terapung bertukar posisi secara automatik setiap 12 saat
-    const watermark = document.getElementById('dynamicWatermark');
-    const positions = [
-      { top: '1rem', right: '1rem', bottom: 'auto', left: 'auto' },
-      { bottom: '1rem', right: '1rem', top: 'auto', left: 'auto' },
-      { bottom: '1rem', left: '1rem', top: 'auto', right: 'auto' },
-      { top: '1rem', left: '1rem', bottom: 'auto', right: 'auto' }
-    ];
-    let posIdx = 0;
-    setInterval(() => {
-      posIdx = (posIdx + 1) % positions.length;
-      const p = positions[posIdx];
-      watermark.style.top = p.top;
-      watermark.style.bottom = p.bottom;
-      watermark.style.left = p.left;
-      watermark.style.right = p.right;
-    }, 12000);
   </script>
 </body>
 </html>
-```
