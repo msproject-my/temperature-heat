@@ -217,7 +217,7 @@
         <div class="flex items-center gap-2">
           <span class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1.5">
             <i class="fa-solid fa-calculator text-indigo-600"></i>
-            <span>Total Heat Energy: <strong>Q_total = Q₁ + Q₂ + Q₃ + Q₄ + Q₅</strong></span>
+            <span>Total Heat Energy: <strong>Q<sub>total</sub> = Q₁ + Q₂ + Q₃ + Q₄ + Q₅</strong></span>
           </span>
         </div>
       </div>
@@ -336,7 +336,7 @@
             name: "Melting (Fusion)",
             phase: "Solid + Liquid",
             heatType: "Latent Heat of Fusion (L<sub>f</sub>)",
-            formula: "Q₂ = m · L_f",
+            formula: "Q₂ = m · L<sub>f</sub>",
             T_start: 0,
             T_end: 0,
             frac: UNIFORM_FRACTION,
@@ -366,7 +366,7 @@
             name: "Boiling / Vaporization",
             phase: "Liquid + Gas",
             heatType: "Latent Heat of Vaporization (L<sub>v</sub>)",
-            formula: "Q₄ = m · L_v>",
+            formula: "Q₄ = m · L<sub>v</sub>>",
             T_start: 100,
             T_end: 100,
             frac: UNIFORM_FRACTION,
@@ -414,7 +414,7 @@
             name: "Condensation",
             phase: "Gas + Liquid",
             heatType: "Latent Heat of Vaporization (L<sub>v</sub>)",
-            formula: "Q₂ = m · L_v",
+            formula: "Q₂ = m · L<sub>v</sub>",
             T_start: 100,
             T_end: 100,
             frac: UNIFORM_FRACTION,
@@ -444,7 +444,7 @@
             name: "Freezing (Solidification)",
             phase: "Liquid + Solid",
             heatType: "Latent Heat of Fusion (L<sub>f</sub>)",
-            formula: "Q₄ = m · L_f",
+            formula: "Q₄ = m · L<sub>f</sub>",
             T_start: 0,
             T_end: 0,
             frac: UNIFORM_FRACTION,
@@ -807,8 +807,8 @@
             ? (currentMode === 'heating' ? "Latent Heat: Melting" : "Latent Heat: Condensation")
             : (currentMode === 'heating' ? "Latent Heat: Boiling" : "Latent Heat: Freezing");
           const latentFormula = (i === 1)
-            ? (currentMode === 'heating' ? "Q₂ = m · L<sub>f</sub>" : "Q₂ = m · L<sub>v</sub>")
-            : (currentMode === 'heating' ? "Q₄ = m · L<sub>v</sub>" : "Q₄ = m · L<sub>f</sub>");
+            ? (currentMode === 'heating' ? "Q₂ = m · L_f" : "Q₂ = m · L_v")
+            : (currentMode === 'heating' ? "Q₄ = m · L_v" : "Q₄ = m · L_f");
           
           const badgeY = p1.y - 34;
           drawTwoRowPill(graphCtx, midX, badgeY, latentTitle, latentFormula, '#92400e', '#fffbeb', '#fcd34d', '#b45309');
