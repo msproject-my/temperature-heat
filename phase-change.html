@@ -102,7 +102,7 @@
         </div>
         <div class="text-sm">
           <span class="inline-block px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 mb-1">Horizontal Plateau</span>
-          <h4 class="font-bold text-slate-800">Latent Heat (L_f / L_v)</h4>
+          <h4 class="font-bold text-slate-800">Latent Heat (L<sub>f</sub> / L<sub>v</sub>)</h4>
           <p class="text-xs text-slate-600 mt-0.5"><strong class="text-amber-700 font-semibold">Formula: Q = mL</strong> &bull; Constant temperature &bull; Two-phase mixture coexistence.</p>
         </div>
       </div>
@@ -253,18 +253,18 @@
             </ul>
           </div>
           <div class="bg-white p-3 rounded-xl border border-slate-200">
-            <span class="font-bold text-amber-600 block mb-1">Melting / Freezing (Q = mL_f)</span>
+            <span class="font-bold text-amber-600 block mb-1">Melting / Freezing (Q = mL<sub>f</sub>)</span>
             <ul class="list-disc list-inside text-slate-600 space-y-1">
-              <li>Specific Latent Heat of Fusion (L_f).</li>
+              <li>Specific Latent Heat of Fusion (L<sub>f</sub>).</li>
               <li>Temperature remains <strong>constant</strong>.</li>
               <li>Overcoming or forming lattice bonds.</li>
               <li>Two phases coexist: <strong>Solid + Liquid</strong>.</li>
             </ul>
           </div>
           <div class="bg-white p-3 rounded-xl border border-slate-200">
-            <span class="font-bold text-amber-600 block mb-1">Boiling / Condensing (Q = mL_v)</span>
+            <span class="font-bold text-amber-600 block mb-1">Boiling / Condensing (Q = mL<sub>v</sub>)</span>
             <ul class="list-disc list-inside text-slate-600 space-y-1">
-              <li>Specific Latent Heat of Vaporization (L_v).</li>
+              <li>Specific Latent Heat of Vaporization (L<sub>v</sub>).</li>
               <li>Temperature remains <strong>constant</strong>.</li>
               <li>Overcoming intermolecular bonds completely.</li>
               <li>Two phases coexist: <strong>Liquid + Gas</strong>.</li>
@@ -335,8 +335,8 @@
             label: "B to C",
             name: "Melting (Fusion)",
             phase: "Solid + Liquid",
-            heatType: "Latent Heat of Fusion (L_f)",
-            formula: "Q₂ = m · L_f",
+            heatType: "Latent Heat of Fusion (L<sub>f</sub>)",
+            formula: "Q₂ = m · L<sub>f</sub>",
             T_start: 0,
             T_end: 0,
             frac: UNIFORM_FRACTION,
@@ -365,8 +365,8 @@
             label: "D to E",
             name: "Boiling / Vaporization",
             phase: "Liquid + Gas",
-            heatType: "Latent Heat of Vaporization (L_v)",
-            formula: "Q₄ = m · L_v",
+            heatType: "Latent Heat of Vaporization (L<sub>v</sub>)",
+            formula: "Q₄ = m · L<sub>v</sub>",
             T_start: 100,
             T_end: 100,
             frac: UNIFORM_FRACTION,
@@ -413,8 +413,8 @@
             label: "Q to R",
             name: "Condensation",
             phase: "Gas + Liquid",
-            heatType: "Latent Heat of Vaporization (L_v)",
-            formula: "Q₂ = m · L_v",
+            heatType: "Latent Heat of Vaporization (L<sub>v</sub>)",
+            formula: "Q₂ = m · L<sub>v</sub>",
             T_start: 100,
             T_end: 100,
             frac: UNIFORM_FRACTION,
@@ -443,8 +443,8 @@
             label: "S to T",
             name: "Freezing (Solidification)",
             phase: "Liquid + Solid",
-            heatType: "Latent Heat of Fusion (L_f)",
-            formula: "Q₄ = m · L_f",
+            heatType: "Latent Heat of Fusion (L<sub>f</sub>)",
+            formula: "Q₄ = m · L<sub>f</sub>",
             T_start: 0,
             T_end: 0,
             frac: UNIFORM_FRACTION,
@@ -807,8 +807,8 @@
             ? (currentMode === 'heating' ? "Latent Heat: Melting" : "Latent Heat: Condensation")
             : (currentMode === 'heating' ? "Latent Heat: Boiling" : "Latent Heat: Freezing");
           const latentFormula = (i === 1)
-            ? (currentMode === 'heating' ? "Q₂ = m · L_f" : "Q₂ = m · L_v")
-            : (currentMode === 'heating' ? "Q₄ = m · L_v" : "Q₄ = m · L_f");
+            ? (currentMode === 'heating' ? "Q₂ = m · L<sub>f</sub>" : "Q₂ = m · L<sub>v</sub>")
+            : (currentMode === 'heating' ? "Q₄ = m · L<sub>v</sub>" : "Q₄ = m · L<sub>f</sub>");
           
           const badgeY = p1.y - 34;
           drawTwoRowPill(graphCtx, midX, badgeY, latentTitle, latentFormula, '#92400e', '#fffbeb', '#fcd34d', '#b45309');
