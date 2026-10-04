@@ -3,27 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TEMPERATURE AND HEAT - Physics Learning Portal</title>
+  <title>Temperature and Heat - Physics Learning Portal</title>
   
-  <!-- Tailwind CSS & Font Awesome Icons -->
+  <!-- Tailwind CSS & Font Awesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
   <style>
-    /* Lock content selection for security */
     body {
-      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at 10% 20%, rgba(2, 132, 199, 0.05) 0%, transparent 40%),
+                  radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 40%),
+                  #f8fafc;
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
-      -webkit-touch-callout: none;
     }
 
-    /* Permit inputs to remain editable */
     input, select, textarea {
       -webkit-user-select: auto !important;
       -moz-user-select: auto !important;
@@ -31,353 +31,282 @@
       user-select: auto !important;
     }
 
-    .hero-gradient {
-      background: radial-gradient(circle at 10% 20%, rgba(2, 132, 199, 0.08) 0%, transparent 40%),
-                  radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.08) 0%, transparent 40%),
-                  #f8fafc;
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Module Card Micro-interactions */
-    .module-card {
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .module-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.12);
+    .glass-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.1);
+      border-color: rgba(2, 132, 199, 0.3);
     }
 
-    /* Custom Input and Button Styles */
-    .modal-input {
-      border: 1.5px solid #cbd5e1;
-      transition: all 0.2s ease;
+    /* Modal Animation */
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
-    .modal-input:focus {
-      border-color: #0081c9;
-      box-shadow: 0 0 0 3px rgba(0, 129, 201, 0.15);
-      outline: none;
-    }
-    .btn-login-blue {
-      background-color: #0081c9;
-      transition: all 0.2s ease;
-    }
-    .btn-login-blue:hover {
-      background-color: #006da8;
-      box-shadow: 0 4px 12px rgba(0, 129, 201, 0.3);
+    .modal-animate {
+      animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
   </style>
 </head>
 
-<body class="hero-gradient text-slate-800 min-h-screen flex flex-col justify-between" oncontextmenu="return false;">
+<body class="min-h-screen flex flex-col justify-between text-slate-800" oncontextmenu="return false;">
 
-  <!-- TOP NAVIGATION HEADER -->
-  <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+  <!-- Header Navigation -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       
-      <!-- Brand & Subject Title -->
+      <!-- Brand Logo & Title -->
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 to-amber-500 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-600 to-amber-500 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
           <i class="fa-solid fa-fire-flame-curved text-xl"></i>
         </div>
         <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-sky-600 block">Interactive Physics Portal</span>
-          <h1 class="text-xl font-extrabold tracking-tight text-slate-900 leading-tight">TEMPERATURE AND HEAT</h1>
+          <span class="text-[10px] font-extrabold uppercase tracking-widest text-sky-600 block leading-tight">Applied Physics</span>
+          <h1 class="text-base sm:text-lg font-black tracking-tight text-slate-900 leading-tight">TEMPERATURE AND HEAT</h1>
         </div>
       </div>
 
-      <!-- User Profile Badge & Login Actions -->
+      <!-- User Area / Login & Logout Buttons -->
       <div class="flex items-center gap-3">
-        <div id="userProfileArea" class="hidden flex items-center gap-2 bg-slate-100/90 py-1.5 px-3.5 rounded-full border border-slate-200">
+        
+        <!-- Logged In Profile Badge (Visible after login) -->
+        <div id="userProfileArea" class="hidden items-center gap-2 bg-slate-100 py-1.5 px-3.5 rounded-full border border-slate-200">
           <div class="w-7 h-7 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs font-bold" id="userAvatar">U</div>
           <div class="text-left leading-tight pr-1">
-            <p class="text-xs font-bold text-slate-800" id="headerUserName">User Name</p>
+            <p class="text-xs font-bold text-slate-800" id="headerUserName">Guest</p>
             <div class="flex items-center gap-1.5">
-              <span class="text-[10px] font-semibold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200" id="headerUserRole">Role</span>
-              <span class="text-[10px] font-mono text-slate-600 hidden" id="headerUserIdBadge">ID</span>
+              <span class="text-[10px] font-semibold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200" id="headerUserRole">Student</span>
+              <span class="text-[10px] font-mono text-slate-500 hidden" id="headerUserIdBadge">ID</span>
             </div>
           </div>
         </div>
 
-        <button id="logoutBtn" onclick="handleLogout()" class="hidden items-center gap-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold px-3.5 py-2 rounded-xl transition">
+        <!-- Logout Button (Shown after login) -->
+        <button 
+          id="logoutBtn" 
+          onclick="handleLogout()" 
+          class="hidden items-center gap-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold px-3 py-2 rounded-xl transition"
+        >
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
-          <span>Logout</span>
+          <span class="hidden sm:inline">Logout</span>
         </button>
 
-        <button id="mainLoginBtn" onclick="openLoginModal()" class="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md transition">
-          <i class="fa-solid fa-right-to-bracket text-xs"></i>
+        <!-- Direct Login Button (Shown when guest) -->
+        <button 
+          id="headerLoginBtn" 
+          onclick="openLoginModal()" 
+          class="flex items-center gap-2 bg-[#0081c9] hover:bg-[#0070b0] text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-xl transition shadow-sm"
+        >
+          <i class="fa-solid fa-user-lock"></i>
           <span>Login</span>
         </button>
+
       </div>
 
     </div>
   </header>
 
-  <!-- MAIN HERO & MODULE SELECTION SECTION -->
-  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full flex flex-col justify-center">
+  <!-- Main Content Area -->
+  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 w-full">
     
     <!-- Hero Title -->
-    <div class="text-center max-w-3xl mx-auto mb-14">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-bold mb-4 tracking-wide uppercase">
-        <i class="fa-solid fa-atom text-sky-600"></i> Physics Interactive Modules
-      </div>
-      <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-        TEMPERATURE AND HEAT
-      </h2>
+    <div class="text-center max-w-3xl mx-auto mb-12">
+      <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">TEMPERATURE AND HEAT</h2>
+      <p class="text-sm sm:text-base text-slate-500 mt-2 font-medium">Select a module below to begin your interactive simulation and calculations.</p>
     </div>
 
-    <!-- 3 MAIN MODULE CARDS (TITLES ONLY) -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+    <!-- 4 Module Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       
-      <!-- MODULE 1: Temperature Conversion -->
-      <div onclick="navigateToModule('temp-conversion.html')" class="module-card bg-white rounded-3xl p-8 border border-slate-200/80 shadow-md cursor-pointer flex flex-col justify-between group relative overflow-hidden min-h-[220px]">
-        <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-sky-50 rounded-full group-hover:scale-125 transition-transform duration-500 -z-0"></div>
-        
-        <div class="relative z-10">
-          <div class="w-14 h-14 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-2xl mb-6 shadow-inner group-hover:bg-sky-600 group-hover:text-white transition-colors duration-300">
+      <!-- Module 01: Temperature Conversion -->
+      <div onclick="navigateToModule('temp-conversion.html')" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between group">
+        <div>
+          <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-xl mb-4 group-hover:bg-sky-600 group-hover:text-white transition duration-300">
             <i class="fa-solid fa-temperature-half"></i>
           </div>
-          <span class="text-xs font-bold text-sky-600 uppercase tracking-widest block mb-2">Module 01</span>
-          <h3 class="text-xl font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
-            Temperature Conversion
-          </h3>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-sky-600 block mb-1">Module 01</span>
+          <h3 class="text-lg font-black text-slate-900 group-hover:text-sky-600 transition">Temperature Conversion</h3>
         </div>
-
-        <div class="relative z-10 pt-6 border-t border-slate-100 flex items-center justify-between text-sky-600 font-semibold text-sm group-hover:translate-x-1 transition-transform">
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-sky-600">
           <span>Open Module</span>
-          <i class="fa-solid fa-arrow-right"></i>
+          <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1 transition"></i>
         </div>
       </div>
 
-      <!-- MODULE 2: Heat Energy and Phase Change -->
-      <div onclick="navigateToModule('phase-change.html')" class="module-card bg-white rounded-3xl p-8 border border-slate-200/80 shadow-md cursor-pointer flex flex-col justify-between group relative overflow-hidden min-h-[220px]">
-        <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-amber-50 rounded-full group-hover:scale-125 transition-transform duration-500 -z-0"></div>
-        
-        <div class="relative z-10">
-          <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl mb-6 shadow-inner group-hover:bg-amber-600 group-hover:text-white transition-colors duration-300">
+      <!-- Module 02: Heat Energy and Phase Change -->
+      <div onclick="navigateToModule('phase-change.html')" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between group">
+        <div>
+          <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-4 group-hover:bg-amber-600 group-hover:text-white transition duration-300">
             <i class="fa-solid fa-fire-burner"></i>
           </div>
-          <span class="text-xs font-bold text-amber-600 uppercase tracking-widest block mb-2">Module 02</span>
-          <h3 class="text-xl font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
-            Heat Energy and Phase Change
-          </h3>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-600 block mb-1">Module 02</span>
+          <h3 class="text-lg font-black text-slate-900 group-hover:text-amber-600 transition">Heat Energy and Phase Change</h3>
         </div>
-
-        <div class="relative z-10 pt-6 border-t border-slate-100 flex items-center justify-between text-amber-600 font-semibold text-sm group-hover:translate-x-1 transition-transform">
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-amber-600">
           <span>Open Module</span>
-          <i class="fa-solid fa-arrow-right"></i>
+          <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1 transition"></i>
         </div>
       </div>
 
-      <!-- MODULE 3: Thermal Equilibrium -->
-      <div onclick="navigateToModule('thermal-equilibrium.html')" class="module-card bg-white rounded-3xl p-8 border border-slate-200/80 shadow-md cursor-pointer flex flex-col justify-between group relative overflow-hidden min-h-[220px]">
-        <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-emerald-50 rounded-full group-hover:scale-125 transition-transform duration-500 -z-0"></div>
-        
-        <div class="relative z-10">
-          <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mb-6 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-300">
+      <!-- Module 03: Heat Transfer Process -->
+      <div onclick="navigateToModule('heat-transfer.html')" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between group">
+        <div>
+          <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl mb-4 group-hover:bg-purple-600 group-hover:text-white transition duration-300">
+            <i class="fa-solid fa-arrows-split-up-and-left"></i>
+          </div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-purple-600 block mb-1">Module 03</span>
+          <h3 class="text-lg font-black text-slate-900 group-hover:text-purple-600 transition">Heat Transfer Process</h3>
+        </div>
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-purple-600">
+          <span>Open Module</span>
+          <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1 transition"></i>
+        </div>
+      </div>
+
+      <!-- Module 04: Thermal Equilibrium -->
+      <div onclick="navigateToModule('thermal-equilibrium.html')" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between group">
+        <div>
+          <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-4 group-hover:bg-emerald-600 group-hover:text-white transition duration-300">
             <i class="fa-solid fa-scale-balanced"></i>
           </div>
-          <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest block mb-2">Module 03</span>
-          <h3 class="text-xl font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
-            Thermal Equilibrium
-          </h3>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 block mb-1">Module 04</span>
+          <h3 class="text-lg font-black text-slate-900 group-hover:text-emerald-600 transition">Thermal Equilibrium</h3>
         </div>
-
-        <div class="relative z-10 pt-6 border-t border-slate-100 flex items-center justify-between text-emerald-600 font-semibold text-sm group-hover:translate-x-1 transition-transform">
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600">
           <span>Open Module</span>
-          <i class="fa-solid fa-arrow-right"></i>
+          <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1 transition"></i>
         </div>
       </div>
 
     </div>
+
   </main>
 
-  <!-- ===================================================================== -->
-  <!-- USER LOGIN MODAL                                                      -->
-  <!-- ===================================================================== -->
-  <div id="loginModalOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <!-- Footer (Clean minimal design matching reference image) -->
+  <footer class="bg-white border-t border-slate-200 py-6 text-center">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="text-xs sm:text-sm font-black tracking-widest text-slate-900 uppercase">MOHDSAIFULPAHRUDIN</p>
+      <p class="text-xs text-slate-500 mt-1 font-medium">© 2026 Politeknik Port Dickson • All Rights Reserved</p>
+    </div>
+  </footer>
+
+  <!-- USER LOGIN MODAL (Strictly matches reference image) -->
+  <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 hidden">
     
-    <!-- Modal Card Box -->
-    <div class="bg-white w-full max-w-[380px] rounded-[24px] p-8 shadow-2xl relative border border-slate-100 animate-in fade-in zoom-in duration-200">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-sm p-6 sm:p-7 relative modal-animate">
       
       <!-- Close Button -->
-      <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center transition">
-        <i class="fa-solid fa-xmark text-lg"></i>
+      <button 
+        type="button" 
+        onclick="closeLoginModal()" 
+        class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-sm"
+        aria-label="Close"
+      >
+        <i class="fa-solid fa-xmark"></i>
       </button>
 
       <!-- Modal Title -->
-      <h3 class="text-center text-xl font-extrabold text-slate-800 tracking-wide mb-6 uppercase">
+      <h3 class="text-center text-lg sm:text-xl font-black text-slate-900 tracking-tight uppercase mb-5">
         USER LOGIN
       </h3>
 
-      <form id="userLoginForm" onsubmit="handleLoginSubmit(event)" class="space-y-5">
+      <!-- Login Form -->
+      <form id="portalLoginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4">
         
-        <!-- FULL NAME Input -->
+        <!-- FULL NAME Field -->
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+          <label class="block text-[11px] font-bold text-slate-700 tracking-wide uppercase mb-1">
             FULL NAME <span class="text-rose-500">*</span>
           </label>
           <input 
             type="text" 
             id="loginFullName" 
-            required 
+            required
+            autocomplete="name"
             placeholder="Enter full name" 
-            class="modal-input w-full px-4 py-3 rounded-xl text-slate-800 placeholder-slate-400 text-sm font-medium"
+            class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0081c9] focus:border-transparent transition"
           >
         </div>
 
         <!-- ROLE Dropdown -->
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+          <label class="block text-[11px] font-bold text-slate-700 tracking-wide uppercase mb-1">
             ROLE <span class="text-rose-500">*</span>
           </label>
           <div class="relative">
             <select 
               id="loginRole" 
-              required 
-              onchange="handleRoleChange()" 
-              class="modal-input w-full px-4 py-3 rounded-xl text-slate-700 text-sm font-medium appearance-none cursor-pointer bg-white"
+              required
+              onchange="handleRoleChange()"
+              class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#0081c9] focus:border-transparent transition appearance-none cursor-pointer pr-10"
             >
               <option value="" disabled selected>-- Select Role --</option>
               <option value="Student">Student</option>
               <option value="Student POLIPD">Student POLIPD</option>
               <option value="Lecturer">Lecturer</option>
             </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-              <i class="fa-solid fa-chevron-down text-xs"></i>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-600 text-xs">
+              <i class="fa-solid fa-chevron-down"></i>
             </div>
           </div>
         </div>
 
-        <!-- STUDENT ID Input (Only shown for Student POLIPD) -->
-        <div id="studentIdWrapper" class="hidden transition-all duration-300">
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+        <!-- Dynamic STUDENT ID Field (Only shown for Student POLIPD) -->
+        <div id="studentIdWrapper" class="hidden">
+          <label class="block text-[11px] font-bold text-slate-700 tracking-wide uppercase mb-1">
             STUDENT ID <span class="text-rose-500">*</span>
           </label>
           <input 
             type="text" 
             id="loginStudentId" 
-            placeholder="Enter student ID" 
-            class="modal-input w-full px-4 py-3 rounded-xl text-slate-800 placeholder-slate-400 text-sm font-medium uppercase font-mono"
+            placeholder="e.g. 06DEP21F1001" 
+            class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0081c9] focus:border-transparent uppercase transition font-mono"
           >
         </div>
 
-        <!-- Status / Feedback Message -->
-        <div id="loginFeedback" class="hidden text-xs rounded-lg p-2.5 text-center font-medium"></div>
+        <!-- Feedback Alert Box -->
+        <div id="loginFeedback" class="hidden text-xs rounded-xl p-3 border font-medium"></div>
 
         <!-- Submit Button -->
         <button 
           type="submit" 
           id="loginSubmitBtn"
-          class="btn-login-blue w-full py-3.5 px-4 rounded-xl text-white font-bold text-base shadow-md flex items-center justify-center gap-2"
+          class="w-full bg-[#0081c9] hover:bg-[#0070b0] text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-sm mt-2"
         >
           <span id="btnText">Login</span>
           <i id="btnSpinner" class="fa-solid fa-circle-notch fa-spin hidden"></i>
         </button>
 
-   
-
       </form>
+
     </div>
   </div>
 
-  <!-- ===================================================================== -->
-  <!-- FOOTER                                                                -->
-  <!-- ===================================================================== -->
-  <footer class="bg-slate-900 text-slate-300 border-t border-slate-800 mt-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-        
-        <!-- Portal Information -->
-        <div class="md:col-span-2">
-          <div class="flex items-center gap-2 mb-3">
-            <i class="fa-solid fa-fire-flame-curved text-sky-400 text-lg"></i>
-            <span class="text-white font-extrabold text-base tracking-wide uppercase">TEMPERATURE AND HEAT</span>
-          </div>
-          <p class="text-xs text-slate-400 leading-relaxed max-w-md">
-            Interactive Physics Learning Portal covering Temperature, Heat Energy,       Phase Change, and Thermal Equilibrium.
-          </p>
-          <div class="mt-4 flex items-center gap-2 text-xs text-emerald-400">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Google Sheets Database: Active Sync</span>
-          </div>
-        </div>
-
-        <!-- Quick Links -->
-        <div>
-          <h4 class="text-white text-xs font-bold uppercase tracking-wider mb-3">Modules</h4>
-          <ul class="space-y-2 text-xs">
-            <li>
-              <a href="temp-conversion.html" class="hover:text-sky-400 transition flex items-center gap-1.5">
-                <i class="fa-solid fa-angle-right text-[10px] text-slate-500"></i> Temperature Conversion
-              </a>
-            </li>
-            <li>
-              <a href="phase-change.html" class="hover:text-amber-400 transition flex items-center gap-1.5">
-                <i class="fa-solid fa-angle-right text-[10px] text-slate-500"></i> Heat Energy and Phase Change
-              </a>
-            </li>
-            <li>
-              <a href="thermal-equilibrium.html" class="hover:text-emerald-400 transition flex items-center gap-1.5">
-                <i class="fa-solid fa-angle-right text-[10px] text-slate-500"></i> Thermal Equilibrium
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Security & Copyright Notice -->
-        <div>
-          <h4 class="text-white text-xs font-bold uppercase tracking-wider mb-3"></h4>
-          <p class="text-xs text-slate-400 leading-relaxed mb-3">
-            
-          </p>
-          <div class="inline-flex items-center gap-1 text-[11px] text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded border border-slate-700">
-            <i class=></i> 
-          </div>
-        </div>
-
-      </div>
-
-  <!-- Bottom Attribution Footer -->
-  <footer class="bg-white border-t border-slate-200 py-4 text-center">
-    <div class="text-xs sm:text-sm font-extrabold tracking-wider text-slate-800 uppercase">
-      MOHDSAIFULPAHRUDIN
-    </div>
-    <div class="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">
-      &copy; 2026 Politeknik Port Dickson &bull; All Rights Reserved
-    </div>
-  </footer>
-
-  <!-- Toast Notification on Security Trigger -->
-  <div id="securityToast" class="fixed bottom-6 right-6 bg-slate-900 text-white border border-slate-700 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 z-50 pointer-events-none">
-    <div class="w-8 h-8 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
-      <i class="fa-solid fa-lock"></i>
-    </div>
-    <div>
-      <h5 class="text-xs font-bold text-white">Security Notice</h5>
-      <p class="text-[11px] text-slate-300" id="toastMessage">Action disabled to protect module copyright.</p>
-    </div>
-  </div>
-
-  <!-- HIDDEN IFRAME PIPELINE (Bypasses Browser CORS/Redirect Restrictions 100%) -->
-  <iframe name="gsheet_sink_frame" id="gsheet_sink_frame" style="display:none; width:0; height:0; border:0;"></iframe>
-  <form id="gsheetDirectForm" method="POST" target="gsheet_sink_frame" style="display:none;">
-    <input type="hidden" name="fullName" id="postFullName">
-    <input type="hidden" name="role" id="postRole">
-    <input type="hidden" name="studentId" id="postStudentId">
-    <input type="hidden" name="device" id="postDevice">
+  <!-- Background Hidden Form for Guaranteed Google Sheets Sync -->
+  <iframe name="gsheet_hidden_frame" id="gsheet_hidden_frame" class="hidden" style="display:none; width:0; height:0;"></iframe>
+  <form id="hiddenSyncForm" target="gsheet_hidden_frame" method="GET" action="https://script.google.com/macros/s/AKfycbzJgFwd6_3elIX2IIIUgaDQxatke14nqFez9pBRQmPKKQKBPD-4pET31aZT-729LVpi/exec" style="display:none;">
+    <input type="hidden" name="fullName" id="hf_fullName">
+    <input type="hidden" name="role" id="hf_role">
+    <input type="hidden" name="studentId" id="hf_studentId">
+    <input type="hidden" name="device" id="hf_device">
   </form>
 
-  <!-- ===================================================================== -->
-  <!-- JAVASCRIPT & GOOGLE SHEETS SYNC LOGIC                                 -->
-  <!-- ===================================================================== -->
   <script>
-    // Live Google Apps Script Web App Endpoint
+    // Google Sheets Web App Endpoint
     const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzJgFwd6_3elIX2IIIUgaDQxatke14nqFez9pBRQmPKKQKBPD-4pET31aZT-729LVpi/exec";
 
-    // 3 Minutes Inactivity Timeout (3 * 60 * 1000 ms = 180,000 ms)
+    // 3 Minutes Inactivity Timeout
     const INACTIVITY_TIMEOUT_MS = 3 * 60 * 1000;
     let idleTimer = null;
+    let pendingRedirectUrl = null;
 
-    // Session State
     let currentUser = {
       isLoggedIn: false,
       name: "",
@@ -385,35 +314,229 @@
       studentId: ""
     };
 
-    // Restore login session or immediately popup login if unauthenticated
+    // Initialize on page load
     window.addEventListener('DOMContentLoaded', () => {
       const savedUser = sessionStorage.getItem('portal_user');
       if (savedUser) {
         try {
           currentUser = JSON.parse(savedUser);
-          if (currentUser.isLoggedIn) {
-            updateHeaderUI();
-            startInactivityTimer();
-            return;
-          }
+          updateHeaderUI();
+          startInactivityTimer();
         } catch (e) {
           console.error("Session parse error", e);
         }
       }
-      
-      // Auto popup login modal immediately on load if not logged in
-      setTimeout(() => {
+
+      // Immediately pop up login modal if user is not authenticated
+      if (!currentUser || !currentUser.isLoggedIn) {
         openLoginModal();
-      }, 300);
+      }
     });
 
-    // Inactivity Watcher (Auto logout after 3 minutes of no interaction)
+    // Smart Navigation: Requires login popup if not yet authenticated
+    function navigateToModule(pageUrl) {
+      if (!pageUrl || typeof pageUrl !== 'string') return;
+
+      if (currentUser && currentUser.isLoggedIn) {
+        window.location.href = pageUrl;
+      } else {
+        pendingRedirectUrl = pageUrl;
+        openLoginModal();
+      }
+    }
+
+    // Role select handler
+    function handleRoleChange() {
+      const roleSelect = document.getElementById('loginRole');
+      const studentIdWrapper = document.getElementById('studentIdWrapper');
+      const studentIdInput = document.getElementById('loginStudentId');
+
+      if (roleSelect && studentIdWrapper && studentIdInput) {
+        if (roleSelect.value === 'Student POLIPD') {
+          studentIdWrapper.classList.remove('hidden');
+          studentIdInput.required = true;
+        } else {
+          studentIdWrapper.classList.add('hidden');
+          studentIdInput.required = false;
+          studentIdInput.value = '';
+        }
+      }
+    }
+
+    // Open/Close Modal
+    function openLoginModal() {
+      const modal = document.getElementById('loginModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+          const input = document.getElementById('loginFullName');
+          if (input) input.focus();
+        }, 150);
+      }
+    }
+
+    function closeLoginModal() {
+      const modal = document.getElementById('loginModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // Handle Form Submit
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+
+      const nameInput = document.getElementById('loginFullName');
+      const roleSelect = document.getElementById('loginRole');
+      const studentIdInput = document.getElementById('loginStudentId');
+
+      const fullName = nameInput ? nameInput.value.trim() : "";
+      const role = roleSelect ? roleSelect.value : "";
+      let studentId = "-";
+
+      if (role === 'Student POLIPD') {
+        studentId = studentIdInput ? studentIdInput.value.trim() : "";
+        if (!studentId) {
+          showFeedback("Please enter your Student ID.", "error");
+          return;
+        }
+      }
+
+      if (!fullName || !role) {
+        showFeedback("Please fill in all required fields.", "error");
+        return;
+      }
+
+      // UI Loading state
+      const btn = document.getElementById('loginSubmitBtn');
+      const spinner = document.getElementById('btnSpinner');
+      const btnText = document.getElementById('btnText');
+      if (btn) btn.disabled = true;
+      if (spinner) spinner.classList.remove('hidden');
+      if (btnText) btnText.textContent = "Verifying...";
+
+      // Save user session
+      currentUser = {
+        isLoggedIn: true,
+        name: fullName,
+        role: role,
+        studentId: studentId
+      };
+      sessionStorage.setItem('portal_user', JSON.stringify(currentUser));
+
+      // Background submission to Google Sheet
+      dispatchBackgroundSync(fullName, role, studentId);
+
+      // Complete login flow
+      setTimeout(() => {
+        if (btn) btn.disabled = false;
+        if (spinner) spinner.classList.add('hidden');
+        if (btnText) btnText.textContent = "Login";
+
+        updateHeaderUI();
+        startInactivityTimer();
+        closeLoginModal();
+
+        // Redirect to pending module if any
+        if (pendingRedirectUrl) {
+          const dest = pendingRedirectUrl;
+          pendingRedirectUrl = null;
+          window.location.href = dest;
+        }
+      }, 500);
+    }
+
+    // Google Sheets Dispatch
+    function dispatchBackgroundSync(fullName, role, studentId) {
+      const userAgent = navigator.userAgent || "Web Browser";
+
+      // Method A: Hidden background iframe form submit
+      try {
+        const hfName = document.getElementById('hf_fullName');
+        const hfRole = document.getElementById('hf_role');
+        const hfId = document.getElementById('hf_studentId');
+        const hfDev = document.getElementById('hf_device');
+        const hForm = document.getElementById('hiddenSyncForm');
+
+        if (hfName && hfRole && hfId && hfDev && hForm) {
+          hfName.value = fullName;
+          hfRole.value = role;
+          hfId.value = studentId;
+          hfDev.value = userAgent;
+          hForm.submit();
+        }
+      } catch (err) {
+        console.warn("Hidden iframe sync notice", err);
+      }
+
+      // Method B: Image Beacon ping
+      try {
+        const pingUrl = `${GOOGLE_SHEET_WEBAPP_URL}?fullName=${encodeURIComponent(fullName)}&role=${encodeURIComponent(role)}&studentId=${encodeURIComponent(studentId)}&device=${encodeURIComponent(userAgent)}&t=${Date.now()}`;
+        const pingImg = new Image();
+        pingImg.src = pingUrl;
+      } catch (err) {
+        console.warn("Ping sync notice", err);
+      }
+    }
+
+    // Update Header UI on state change
+    function updateHeaderUI() {
+      const profileArea = document.getElementById('userProfileArea');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const loginBtn = document.getElementById('headerLoginBtn');
+      const userName = document.getElementById('headerUserName');
+      const userRole = document.getElementById('headerUserRole');
+      const userAvatar = document.getElementById('userAvatar');
+      const userIdBadge = document.getElementById('headerUserIdBadge');
+
+      if (currentUser && currentUser.isLoggedIn) {
+        if (profileArea) profileArea.classList.remove('hidden');
+        if (profileArea) profileArea.classList.add('flex');
+        if (logoutBtn) logoutBtn.classList.remove('hidden');
+        if (logoutBtn) logoutBtn.classList.add('flex');
+        if (loginBtn) loginBtn.classList.add('hidden');
+
+        if (userName) userName.textContent = currentUser.name;
+        if (userRole) userRole.textContent = currentUser.role;
+        if (userAvatar) userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+
+        if (userIdBadge) {
+          if (currentUser.studentId && currentUser.studentId !== '-') {
+            userIdBadge.textContent = currentUser.studentId;
+            userIdBadge.classList.remove('hidden');
+          } else {
+            userIdBadge.classList.add('hidden');
+          }
+        }
+      } else {
+        if (profileArea) profileArea.classList.add('hidden');
+        if (profileArea) profileArea.classList.remove('flex');
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+        if (logoutBtn) logoutBtn.classList.remove('flex');
+        if (loginBtn) loginBtn.classList.remove('hidden');
+      }
+    }
+
+    // Feedback message display
+    function showFeedback(msg, type) {
+      const fb = document.getElementById('loginFeedback');
+      if (!fb) return;
+      fb.classList.remove('hidden', 'bg-rose-50', 'text-rose-700', 'border-rose-200', 'bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+
+      if (type === 'error') {
+        fb.classList.add('bg-rose-50', 'text-rose-700', 'border-rose-200');
+      } else {
+        fb.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+      }
+      fb.textContent = msg;
+    }
+
+    // Inactivity Watcher (Auto logout after 3 minutes)
     function resetInactivityTimer() {
-      if (!currentUser.isLoggedIn) return;
       if (idleTimer) clearTimeout(idleTimer);
-      idleTimer = setTimeout(() => {
-        handleLogout(true);
-      }, INACTIVITY_TIMEOUT_MS);
+      if (currentUser && currentUser.isLoggedIn) {
+        idleTimer = setTimeout(() => {
+          handleLogout();
+        }, INACTIVITY_TIMEOUT_MS);
+      }
     }
 
     function startInactivityTimer() {
@@ -424,336 +547,14 @@
       resetInactivityTimer();
     }
 
-    function stopInactivityTimer() {
-      if (idleTimer) clearTimeout(idleTimer);
-      const activityEvents = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
-      activityEvents.forEach(evt => {
-        window.removeEventListener(evt, resetInactivityTimer);
-      });
-    }
-
-    // Logout Functionality (Manual & Auto)
-    function handleLogout(isAuto = false) {
-      stopInactivityTimer();
-
-      currentUser = {
-        isLoggedIn: false,
-        name: "",
-        role: "",
-        studentId: ""
-      };
+    // Logout Handler
+    function handleLogout() {
       sessionStorage.removeItem('portal_user');
+      currentUser = { isLoggedIn: false, name: "", role: "", studentId: "" };
+      if (idleTimer) clearTimeout(idleTimer);
 
-      // Reset Header UI safely
-      const profileArea = document.getElementById('userProfileArea');
-      if (profileArea) profileArea.classList.add('hidden');
-      
-      const logoutBtn = document.getElementById('logoutBtn');
-      if (logoutBtn) logoutBtn.classList.add('hidden');
-
-      const loginBtn = document.getElementById('mainLoginBtn');
-      if (loginBtn) {
-        loginBtn.classList.remove('hidden');
-        loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket text-xs"></i><span>Login</span>';
-        loginBtn.className = "flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md transition";
-      }
-
-      // Reset Form fields
-      const loginForm = document.getElementById('userLoginForm');
-      if (loginForm) loginForm.reset();
-      
-      const studentIdWrapper = document.getElementById('studentIdWrapper');
-      if (studentIdWrapper) studentIdWrapper.classList.add('hidden');
-
-      if (isAuto) {
-        showSecurityToast("Logged out automatically due to 3 minutes of inactivity.");
-      } else {
-        showSecurityToast("You have been logged out successfully.");
-      }
-
-      // Automatically re-trigger login modal
-      setTimeout(() => {
-        openLoginModal();
-      }, 400);
-    }
-
-    // Open & Close Modal
-    function openLoginModal() {
-      const modal = document.getElementById('loginModalOverlay');
-      if (modal) modal.classList.remove('hidden');
-      const input = document.getElementById('loginFullName');
-      if (input) input.focus();
-    }
-
-    function closeLoginModal() {
-      const modal = document.getElementById('loginModalOverlay');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    // Toggle Student ID input when Role is Student POLIPD
-    function handleRoleChange() {
-      const roleSelect = document.getElementById('loginRole');
-      const studentIdWrapper = document.getElementById('studentIdWrapper');
-      const studentIdInput = document.getElementById('loginStudentId');
-
-      if (!roleSelect || !studentIdWrapper || !studentIdInput) return;
-
-      if (roleSelect.value === 'Student POLIPD') {
-        studentIdWrapper.classList.remove('hidden');
-        studentIdInput.required = true;
-      } else {
-        studentIdWrapper.classList.add('hidden');
-        studentIdInput.required = false;
-        studentIdInput.value = '';
-      }
-    }
-
-    // Submit Login to Google Apps Script (TRIPLE FALLBACK PIPELINE)
-    function handleLoginSubmit(event) {
-      event.preventDefault();
-      
-      const nameInput = document.getElementById('loginFullName');
-      const roleSelect = document.getElementById('loginRole');
-      const studentIdInput = document.getElementById('loginStudentId');
-      
-      const name = nameInput ? nameInput.value.trim() : "";
-      const role = roleSelect ? roleSelect.value : "";
-      const studentId = studentIdInput ? studentIdInput.value.trim() : "";
-
-      const submitBtn = document.getElementById('loginSubmitBtn');
-      const btnText = document.getElementById('btnText');
-      const btnSpinner = document.getElementById('btnSpinner');
-
-      if (!name || !role) {
-        showFeedback("Please complete all required fields (*).", "error");
-        return;
-      }
-
-      if (role === 'Student POLIPD' && !studentId) {
-        showFeedback("Please enter your Student ID.", "error");
-        if (studentIdInput) studentIdInput.focus();
-        return;
-      }
-
-      if (submitBtn) submitBtn.disabled = true;
-      if (btnText) btnText.textContent = "Logging in...";
-      if (btnSpinner) btnSpinner.classList.remove('hidden');
-
-      currentUser.isLoggedIn = true;
-      currentUser.name = name;
-      currentUser.role = role;
-      currentUser.studentId = (role === 'Student POLIPD') ? studentId : '-';
-      sessionStorage.setItem('portal_user', JSON.stringify(currentUser));
-
-      const deviceString = navigator.userAgent.substring(0, 90);
-
-      // PIPELINE 1: Direct Form Submission to Hidden Iframe
-      try {
-        const hiddenForm = document.getElementById('gsheetDirectForm');
-        if (hiddenForm) {
-          hiddenForm.action = GOOGLE_SHEET_WEBAPP_URL;
-          document.getElementById('postFullName').value = name;
-          document.getElementById('postRole').value = role;
-          document.getElementById('postStudentId').value = currentUser.studentId;
-          document.getElementById('postDevice').value = deviceString;
-          hiddenForm.submit();
-        }
-      } catch (err) {
-        console.warn("Iframe form error:", err);
-      }
-
-      // PIPELINE 2: Fetch POST with mode no-cors
-      try {
-        const formData = new URLSearchParams();
-        formData.append("fullName", name);
-        formData.append("role", role);
-        formData.append("studentId", currentUser.studentId);
-        formData.append("device", deviceString);
-
-        fetch(GOOGLE_SHEET_WEBAPP_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          body: formData.toString()
-        }).catch(() => {});
-      } catch (fetchErr) {
-        console.warn("Fetch POST error:", fetchErr);
-      }
-
-      // PIPELINE 3: Secondary Image Ping via GET
-      try {
-        const queryParams = `fullName=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}&studentId=${encodeURIComponent(currentUser.studentId)}&device=${encodeURIComponent(deviceString)}`;
-        const pingBeacon = new Image();
-        pingBeacon.src = `${GOOGLE_SHEET_WEBAPP_URL}?${queryParams}&_t=${Date.now()}`;
-      } catch (beaconErr) {
-        console.warn("Beacon error:", beaconErr);
-      }
-
-      showFeedback("Login successful! Welcome.", "success");
       updateHeaderUI();
-      startInactivityTimer();
-
-      setTimeout(() => {
-        if (submitBtn) submitBtn.disabled = false;
-        if (btnText) btnText.textContent = "Login";
-        if (btnSpinner) btnSpinner.classList.add('hidden');
-        closeLoginModal();
-      }, 500);
-    }
-
-    // Direct Diagnostic Test function
-    function testGSheetConnection() {
-      const fb = document.getElementById('loginFeedback');
-      showFeedback("Testing connection to Google Sheets...", "info");
-
-      const testUrl = `${GOOGLE_SHEET_WEBAPP_URL}?fullName=TEST_DIAGNOSTIC&role=Tester&studentId=9999&_t=${Date.now()}`;
-      
-      // Open in a popup or new tab directly to show actual Google server response
-      window.open(testUrl, '_blank', 'width=500,height=300');
-      showFeedback("Opened test in new tab. Check your Google Sheet now!", "success");
-    }
-
-    // Update Header UI on Login
-    function updateHeaderUI() {
-      if (!currentUser.isLoggedIn) return;
-
-      const nameEl = document.getElementById('headerUserName');
-      if (nameEl) nameEl.textContent = currentUser.name;
-
-      const roleEl = document.getElementById('headerUserRole');
-      if (roleEl) roleEl.textContent = currentUser.role;
-
-      const avatarEl = document.getElementById('userAvatar');
-      if (avatarEl) avatarEl.textContent = currentUser.name.charAt(0).toUpperCase();
-
-      const badgeId = document.getElementById('headerUserIdBadge');
-      if (badgeId) {
-        if (currentUser.studentId && currentUser.studentId !== '-') {
-          badgeId.textContent = currentUser.studentId;
-          badgeId.classList.remove('hidden');
-        } else {
-          badgeId.classList.add('hidden');
-        }
-      }
-
-      const profileArea = document.getElementById('userProfileArea');
-      if (profileArea) profileArea.classList.remove('hidden');
-
-      const loginBtn = document.getElementById('mainLoginBtn');
-      if (loginBtn) loginBtn.classList.add('hidden');
-
-      const logoutBtn = document.getElementById('logoutBtn');
-      if (logoutBtn) {
-        logoutBtn.classList.remove('hidden');
-        logoutBtn.classList.add('flex');
-      }
-    }
-
-    function showFeedback(message, type = "info") {
-      const fb = document.getElementById('loginFeedback');
-      if (!fb) return;
-      fb.classList.remove('hidden', 'bg-rose-50', 'text-rose-600', 'border-rose-200', 'bg-emerald-50', 'text-emerald-600', 'border-emerald-200');
-      fb.classList.add('border');
-      if (type === 'error') {
-        fb.classList.add('bg-rose-50', 'text-rose-600', 'border-rose-200');
-      } else {
-        fb.classList.add('bg-emerald-50', 'text-emerald-600', 'border-emerald-200');
-      }
-      fb.textContent = message;
-    }
-
-    // Safe Navigation to Modules
-    function navigateToModule(pageUrl) {
-      if (!currentUser.isLoggedIn) {
-        showSecurityToast("Please log in first to access this module.");
-        openLoginModal();
-        return;
-      }
-
-      if (!pageUrl || typeof pageUrl !== 'string' || pageUrl.trim() === '' || pageUrl === '#') {
-        console.warn("navigateToModule called with an invalid or empty URL:", pageUrl);
-        showSecurityToast("Module page is not configured yet.");
-        return;
-      }
-
-      const targetUrl = pageUrl.trim();
-
-      if (window.location.protocol === 'blob:') {
-        console.info(`Sandbox preview detected. Target module: ${targetUrl}`);
-        showSecurityToast(`Navigating to ${targetUrl} (In deployment, this opens the sub-page)`);
-        return;
-      }
-
-      try {
-        window.location.href = targetUrl;
-      } catch (err) {
-        console.error("Navigation failed:", err);
-        showSecurityToast(`Unable to open ${targetUrl}`);
-      }
-    }
-
-    // =====================================================================
-    // SECURITY & ANTI-TAMPER SHIELD
-    // =====================================================================
-    
-    document.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-      showSecurityToast("Right-click context menu is disabled.");
-      return false;
-    });
-
-    document.addEventListener('keydown', function(e) {
-      if (e.keyCode === 123) {
-        e.preventDefault();
-        showSecurityToast("Developer tools (F12) are disabled.");
-        return false;
-      }
-      if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
-        e.preventDefault();
-        showSecurityToast("Developer tools inspection is disabled.");
-        return false;
-      }
-      if (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 117)) {
-        e.preventDefault();
-        showSecurityToast("Viewing source code is disabled.");
-        return false;
-      }
-      if (e.ctrlKey && (e.keyCode === 83 || e.keyCode === 115)) {
-        e.preventDefault();
-        showSecurityToast("Saving this page is disabled.");
-        return false;
-      }
-      if (e.metaKey && e.altKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
-        e.preventDefault();
-        showSecurityToast("Developer tools are disabled.");
-        return false;
-      }
-      if (e.metaKey && e.keyCode === 85) {
-        e.preventDefault();
-        return false;
-      }
-    });
-
-    document.addEventListener('dragstart', function(e) {
-      e.preventDefault();
-      return false;
-    });
-
-    let toastTimeout;
-    function showSecurityToast(message) {
-      const toast = document.getElementById('securityToast');
-      document.getElementById('toastMessage').textContent = message;
-      
-      toast.classList.remove('translate-y-24', 'opacity-0');
-      toast.classList.add('translate-y-0', 'opacity-100');
-
-      clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
-        toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('translate-y-24', 'opacity-0');
-      }, 2800);
+      openLoginModal();
     }
   </script>
 </body>
